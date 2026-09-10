@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
+<title>LIFF 使用者識別碼範例</title>
+
+<!-- ① 載入 LIFF SDK（放在最前面）-->
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+<style>
+  :root{ color-scheme:light only; }
+  *{box-sizing:border-box}
+  body{
+    margin:0;padding:20px;
+    font-family:-apple-system,"Noto Sans TC",sans-serif;
+    background:#f5f5f0;color:#333;
+  }
+  .card{
+    max-width:480px;margin:0 auto;background:#fff;
+    border-radius:14px;padding:22px;
+    box-shadow:0 2px 10px rgba(0,0,0,.06);
+  }
+  h1{font-size:19px;margin:0 0 4px}
+  .sub{font-size:13px;color:#888;margin:0 0 18px}
+
+  #status{
+    padding:11px 13px;border-radius:9px;font-size:13px;
+    margin-bottom:16px;line-height:1.6;
+  }
+  .loading{background:#fff8e1;color:#8a6d00}
+  .ok     {background:#e8f5e9;color:#2e6b34}
+  .fail   {background:#ffebee;color:#b3261e}
+
+  .profile{display:none;align-items:center;gap:12px;margin-bottom:18px}
+  .profile.show{display:flex}
+  .profile img{width:52px;height:52px;border-radius:50%;background:#eee;object-fit:cover}
+  .pname{font-weight:700;font-size:15px}
+  .pid{font-size:11px;color:#999;word-break:break-all;line-height:1.4}
+
+  label{display:block;font-size:13px;font-weight:600;margin:14px 0 5px}
+  input{
+    width:100%;padding:10px 12px;font-size:14px;
+    border:1px solid #ddd;border-radius:9px;outline:none;background:#fff;
+  }
+  input:focus{border-color:#06c755}
+  input[readonly]{background:#f7f7f7;color:#777;font-size:11.5px}
+
+  button{
+    width:100%;margin-top:20px;padding:13px;
+    background:#06c755;color:#fff;border:none;border-radius:10px;
+    font-size:15px;font-weight:700;cursor:pointer;
+  }
+  button:disabled{background:#c8c8c8;cursor:not-allowed}
+  .hint{font-size:11.5px;color:#999;margin-top:14px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>自備食器登記</h1>
+  <p class="sub">LIFF 使用者識別碼範例</p>
+
+  <div id="status" class="loading">正在連線 LINE…</div>
+
+  <div class="profile" id="profile">
+    <img id="p-pic" alt="">
+    <div>
+      <div class="pname" id="p-name"></div>
+      <div class="pid"  id="p-id"></div>
+    </div>
+  </div>
+
+  <label>姓名</label>
+  <input id="f-name" type="text" placeholder="請輸入姓名">
+
+  <label>電話</label>
+  <input id="f-phone" type="tel" placeholder="09xxxxxxxx">
+
+  <!-- ② 隱藏欄位：自動帶入，使用者看不到也改不了 -->
+  <label>LINE 識別碼（自動帶入）</label>
+  <input id="f-userid" type="text" readonly placeholder="尚未取得">
+
+  <button id="submit-btn" disabled onclick="doSubmit()">送出登記</button>
+
+  <p class="hint">
+    本頁需在 LINE 中開啟才能自動辨識身分。<br>
+    識別碼僅用於本活動的重複登記查核，不會用於其他用途。
+  </p>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  設定區：換成你自己的
+// ─────────────────────────────────────────────
+const LIFF_ID    = "1234567890-abcdefgh";              // ← 後台取得的 LIFF ID
+const SCRIPT_URL = "https://script.google.com/macros/s/你的部署ID/exec";
+// ─────────────────────────────────────────────
+
+let myUserId = "";
+let myName   = "";
+
+function setStatus(msg, cls){
+  const el = document.getElementById("status");
+  el.textContent = msg;
+  el.className = cls;
+}
+
+// ③ 初始化 → 檢查登入 → 取得個人資料
+async function initLiff(){
+  try{
+    await liff.init({ liffId: LIFF_ID });
+
+    // 未登入就導去登入（在 LINE 內通常會自動完成）
+    if(!liff.isLoggedIn()){
+      liff.login({ redirectUri: window.location.href });
+      return;
+    }
+
+    const profile = await liff.getProfile();
+    myUserId = profile.userId;
+    myName   = profile.displayName;
+
+    // 顯示出來（正式版可拿掉，改成完全隱藏）
+    document.getElementById("p-name").textContent = myName;
+    document.getElementById("p-id").textContent   = myUserId;
+    if(profile.pictureUrl) document.getElementById("p-pic").src = profile.pictureUrl;
+    document.getElementById("profile").classList.add("show");
+
+    // ④ 寫進表單欄位
+    document.getElementById("f-userid").value = myUserId;
+
+    // 順便把暱稱預填到姓名（使用者可自行修改）
+    const nameField = document.getElementById("f-name");
+    if(!nameField.value) nameField.value = myName;
+
+    document.getElementById("submit-btn").disabled = false;
+    setStatus("✓ 已辨識身分：" + myName, "ok");
+
+  }catch(err){
+    // 在一般瀏覽器直接開啟會走到這裡
+    setStatus("無法取得 LINE 身分（請從 LINE 開啟本頁）\n" + err, "fail");
+    document.getElementById("submit-btn").disabled = false;   // 仍允許手動填寫
+  }
+}
+
+// ⑤ 送出：把 userId 一併帶給後端
+function doSubmit(){
+  const name  = document.getElementById("f-name").value.trim();
+  const phone = document.getElementById("f-phone").value.trim();
+  if(!name || !phone){ alert("請填寫姓名與電話"); return; }
+
+  const params = new URLSearchParams({
+    action: "submit",
+    customerName: name,
+    customerPhone: phone,
+    lineUserId: myUserId,          // ← 關鍵：帶上識別碼
+    lineName: myName,
+    wid: Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,10)
+  });
+
+  const s = document.createElement("script");
+  s.src = SCRIPT_URL + "?" + params.toString() + "&callback=onDone";
+  document.head.appendChild(s);
+
+  document.getElementById("submit-btn").disabled = true;
+  document.getElementById("submit-btn").textContent = "送出中…";
+}
+
+function onDone(res){
+  if(res && res.success){
+    alert("登記成功！");
+    // 在 LINE 內可自動關閉視窗
+    if(liff.isInClient()) liff.closeWindow();
+  }else{
+    alert("送出失敗：" + (res && res.error ? res.error : "未知錯誤"));
+    document.getElementById("submit-btn").disabled = false;
+    document.getElementById("submit-btn").textContent = "送出登記";
+  }
+}
+
+initLiff();
+</script>
+</body>
+</html>
