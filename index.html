@@ -10,14 +10,11 @@
 :root{
   color-scheme:light only;
   --cream:#f7f4ea; --card:#fff; --ink:#3d3226; --ink2:#7d7365; --ink3:#a9a196;
-  --green:#5c8a4a; --brown:#8b6f47; --red:#c0503f; --line:#e5ded0;
-  --r:14px;
+  --green:#5c8a4a; --brown:#8b6f47; --red:#c0503f; --line:#e5ded0; --soft:#f2f7ef;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{
-  margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
-  font-family:-apple-system,"Noto Sans TC",sans-serif;line-height:1.6;
-}
+body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
+     font-family:-apple-system,"Noto Sans TC",sans-serif;line-height:1.6}
 .wrap{max-width:520px;margin:0 auto}
 
 .head{display:flex;align-items:center;gap:11px;margin-bottom:14px}
@@ -30,45 +27,64 @@ body{
 .ok{background:#e9f3e4;color:#3f6b31}
 .fail{background:#fbeae7;color:#a8392a}
 
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:13px}
-.lbl{font-size:13px;font-weight:700;margin-bottom:9px;display:block}
-.hint{font-size:11.5px;color:var(--ink3);line-height:1.55;margin-top:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+      padding:16px;margin-bottom:13px}
+.lbl{font-size:13.5px;font-weight:700;margin-bottom:4px;display:block}
+.guide{font-size:12px;color:var(--ink2);background:var(--soft);border-radius:9px;
+       padding:9px 11px;margin:8px 0 11px;line-height:1.65}
+.guide b{color:var(--green)}
+.hint{font-size:11.5px;color:var(--ink3);line-height:1.55;margin-top:7px}
 
 .tasks{display:grid;gap:8px}
-.task{
-  display:flex;align-items:center;gap:11px;padding:12px;
-  border:1.5px solid var(--line);border-radius:11px;background:#fff;cursor:pointer;
-}
-.task.on{border-color:var(--green);background:#f2f7ef}
+.task{display:flex;align-items:center;gap:11px;padding:12px;border:1.5px solid var(--line);
+      border-radius:11px;background:#fff;cursor:pointer}
+.task.on{border-color:var(--green);background:var(--soft)}
 .task.done{opacity:.45}
 .task .em{font-size:22px;line-height:1}
 .task .tt{font-weight:700;font-size:14px}
 .task .td{font-size:11.5px;color:var(--ink2)}
+.task .lim{font-size:11px;color:var(--green);font-weight:600}
 
-input[type=text],input[type=number]{
-  width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;
-  background:#fff;color:var(--ink);font-size:15px;outline:none;
-}
-input:focus{border-color:var(--green)}
+.subs{display:flex;gap:7px;flex-wrap:wrap}
+.sub{flex:1;min-width:98px;text-align:center;padding:11px 6px;border:1.5px solid var(--line);
+     border-radius:10px;font-size:13px;cursor:pointer;background:#fff}
+.sub.on{border-color:var(--green);background:var(--soft);color:var(--green);font-weight:700}
+
+.items{display:grid;gap:9px}
+.item{display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:11px 13px;border:1px solid var(--line);border-radius:11px}
+.item .nm{font-size:14px;font-weight:600}
+.stepper{display:flex;align-items:center;gap:11px}
+.stepper button{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);
+                background:#fff;font-size:19px;color:var(--ink);cursor:pointer;line-height:1}
+.stepper button:active{background:#eee}
+.stepper button:disabled{opacity:.35}
+.stepper .n{min-width:24px;text-align:center;font-size:16px;font-weight:700}
+.total{margin-top:11px;padding:10px;background:var(--soft);border-radius:9px;
+       text-align:center;font-size:13.5px;font-weight:700;color:var(--green)}
+
+input[type=text]{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;
+                 background:#fff;color:var(--ink);font-size:15px;outline:none}
+textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;
+         background:#fff;color:var(--ink);font-size:14px;outline:none;resize:vertical;
+         min-height:62px;font-family:inherit}
+input:focus,textarea:focus{border-color:var(--green)}
 .storename{font-size:12.5px;margin-top:7px;font-weight:600}
 .storeok{color:var(--green)} .storeng{color:var(--red)}
 
-.shot{
-  display:block;width:100%;padding:26px 12px;border:2px dashed var(--line);
-  border-radius:12px;background:#fdfcf8;text-align:center;cursor:pointer;
-}
+.shot{display:block;width:100%;padding:26px 12px;border:2px dashed var(--line);
+      border-radius:12px;background:#fdfcf8;text-align:center;cursor:pointer}
 .shot .ic{font-size:26px}
 .shot .tx{font-size:13px;color:var(--ink2);margin-top:5px}
 .shot.has{border-style:solid;border-color:var(--green);padding:0;overflow:hidden}
 .shot img{width:100%;display:block;max-height:230px;object-fit:cover}
 input[type=file]{display:none}
 
-.btn{
-  width:100%;padding:15px;border:none;border-radius:12px;background:var(--green);
-  color:#fff;font-size:16px;font-weight:700;cursor:pointer;margin-top:6px;
-}
+.btn{width:100%;padding:15px;border:none;border-radius:12px;background:var(--green);
+     color:#fff;font-size:16px;font-weight:700;cursor:pointer;margin-top:6px}
 .btn:disabled{background:#c3bfb6}
-.btn.sub{background:transparent;color:var(--ink2);border:1px solid var(--line);font-size:14px;padding:11px;margin-top:9px}
+.btn.sub2{background:transparent;color:var(--ink2);border:1px solid var(--line);
+          font-size:14px;padding:11px;margin-top:9px}
 
 .done-box{display:none;text-align:center;padding:28px 16px}
 .done-box.show{display:block}
@@ -76,6 +92,8 @@ input[type=file]{display:none}
 .done-box h2{font-size:19px;margin:10px 0 5px}
 .done-box p{font-size:13.5px;color:var(--ink2);margin:0 0 6px}
 .sn{font-family:ui-monospace,monospace;font-size:11.5px;color:var(--ink3)}
+.step-no{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;
+         background:var(--green);color:#fff;border-radius:50%;font-size:12px;margin-right:6px}
 </style>
 </head>
 <body>
@@ -91,39 +109,71 @@ input[type=file]{display:none}
 
   <div id="status" class="loading">正在連線…</div>
 
-  <div id="form">
+  <div id="form" style="display:none">
+
     <div class="card">
-      <span class="lbl">① 選擇任務</span>
+      <span class="lbl"><span class="step-no">1</span>選擇任務</span>
+      <div class="guide" id="g-task">
+        點選你這次要回報的行為。每個任務的規則與可得點數不同。
+      </div>
       <div class="tasks" id="tasks"></div>
     </div>
 
-    <div class="card" id="store-card" style="display:none">
-      <span class="lbl">② 店家編號</span>
+    <div class="card" id="card-sub" style="display:none">
+      <span class="lbl"><span class="step-no">2</span>減量作為類型</span>
+      <div class="guide">
+        請選擇你這次做的是哪一種。<b>捐出或交換物品</b>、<b>購買二手物</b>、<b>把壞掉的東西修好</b>都算。
+      </div>
+      <div class="subs" id="subs"></div>
+    </div>
+
+    <div class="card" id="card-items" style="display:none">
+      <span class="lbl"><span class="step-no">2</span>這次自備了幾件？</span>
+      <div class="guide">
+        <b>每一件算 1 點。</b>例如帶了 2 個環保杯＋1 個購物袋，就是 3 點。<br>
+        請確認照片裡看得到你回報的每一件，審核時會核對數量。
+      </div>
+      <div class="items" id="items"></div>
+      <div class="total" id="item-total">目前 0 件・可得 0 點</div>
+    </div>
+
+    <div class="card" id="card-store" style="display:none">
+      <span class="lbl"><span class="step-no">3</span>店家編號</span>
+      <div class="guide">
+        請看店家櫃台的<b>認證標章貼紙</b>，上面有三位數編號。掃 QR Code 會自動帶入。
+      </div>
       <input id="store" type="text" inputmode="numeric" placeholder="例如 001" oninput="chkStore()">
       <div class="storename" id="storename"></div>
-      <div class="hint">請掃描店家貼紙上的 QR Code，或輸入貼紙上的編號。</div>
     </div>
 
     <div class="card">
-      <span class="lbl" id="lbl-p1">③ 自備容器照片（必要）</span>
+      <span class="lbl" id="lbl-p1"></span>
+      <div class="guide" id="g-p1"></div>
       <label class="shot" id="box1">
         <input type="file" accept="image/*" onchange="pick(this,1)">
         <div id="in1"><div class="ic">📷</div><div class="tx">拍照或選擇照片</div></div>
       </label>
-      <div class="hint">請讓「自備的容器」與「店家認證標章」同時入鏡。</div>
     </div>
 
     <div class="card">
-      <span class="lbl">④ 當日消費證明（建議）</span>
+      <span class="lbl" id="lbl-p2"></span>
+      <div class="guide" id="g-p2"></div>
       <label class="shot" id="box2">
         <input type="file" accept="image/*" onchange="pick(this,2)">
-        <div id="in2"><div class="ic">🧾</div><div class="tx">發票、收據或訂單畫面</div></div>
+        <div id="in2"><div class="ic">🧾</div><div class="tx">拍照或選擇照片</div></div>
       </label>
-      <div class="hint">附上消費證明可加快審核，也能避免被誤判為重複上傳。</div>
+    </div>
+
+    <div class="card">
+      <span class="lbl">補充說明（選填）</span>
+      <div class="guide">
+        照片看不清楚、或有特殊情況想讓審核人員知道，可以寫在這裡。
+      </div>
+      <textarea id="note" maxlength="200" placeholder="例如：自備保溫瓶裝豆漿，標章在櫃台右側"></textarea>
     </div>
 
     <button class="btn" id="send" onclick="send()" disabled>送出</button>
-    <button class="btn sub" onclick="location.href='records.html'">查看我的紀錄</button>
+    <button class="btn sub2" onclick="location.href='records.html'">查看我的紀錄與兌換</button>
   </div>
 
   <div class="done-box" id="done">
@@ -132,26 +182,41 @@ input[type=file]{display:none}
     <p id="done-m"></p>
     <p class="sn" id="done-s"></p>
     <button class="btn" onclick="location.reload()">再上傳一筆</button>
-    <button class="btn sub" id="close-btn" onclick="closeWin()">關閉</button>
+    <button class="btn sub2" onclick="location.href='records.html'">查看我的紀錄</button>
+    <button class="btn sub2" id="close-btn" onclick="closeWin()">關閉</button>
   </div>
 
 </div>
 
 <script>
-/* ═══ 設定：換成你自己的 ═══ */
+/* ═══ 設定 ═══ */
 const LIFF_ID = "2011533465-IUMILFYy";
 const API     = "https://script.google.com/macros/s/AKfycbytQFDvJ9aBHqrz4TgAqz4pnNfwLv4dxUgjG9pBY1WFipiCKUF5jqiHtF91HX626ZhYHQ/exec";
-/* ═════════════════════════ */
+/* ═══════════ */
 
-const TASKS = [
-  {k:"A", em:"🥤", t:"自備容器", d:"帶環保杯、餐盒或袋到合作店家消費"},
-  {k:"B", em:"🧳", t:"旅遊自備小樣", d:"自備盥洗用品或環保杯入住本市旅宿"},
-  {k:"C", em:"♻️", t:"不用品交換", d:"到再使用據點捐出、交換或取用物品"}
-];
+/* 各任務的畫面文字。改任務名稱時這裡也要一起改。 */
+const TASK_UI = {
+  A:{ em:"🥤", desc:"帶環保杯、餐盒或購物袋到合作店家消費",
+      p1:"自備容器照片（必要）",
+      g1:"請讓<b>自備的容器</b>與店家的<b>認證標章</b>同時入鏡。若回報多件，請一起拍進同一張照片。",
+      p2:"當日消費證明（建議）",
+      g2:"發票、收據或訂單畫面。附上可加快審核，也能避免被誤判為重複上傳。" },
+  B:{ em:"🧳", desc:"自備盥洗用品或環保杯入住本市旅宿",
+      p1:"自備小樣照片（必要）",
+      g1:"請拍下你<b>自己帶的盥洗用品或環保杯</b>，最好與旅宿房間或櫃台一起入鏡。",
+      p2:"住宿證明（建議）",
+      g2:"訂房確認畫面或住宿收據，用來確認入住日期與地點。" },
+  C:{ em:"♻️", desc:"交換、購買二手或維修物品，延長物品壽命",
+      p1:"物品照片（必要）",
+      g1:"請拍下<b>交換／購買／維修的物品</b>。維修類請盡量拍出修復後的樣子。",
+      p2:"地點或單據照片（建議）",
+      g2:"據點招牌、二手市集現場、購買收據或維修單據皆可。" }
+};
 
-let uid="", uname="", task="", ph1="", ph2="", weekDone={};
+let uid="", uname="", task="", subtype="", ph1="", ph2="";
+let CONF=null, counts={};
 
-function $(id){ return document.getElementById(id); }
+function $(i){ return document.getElementById(i); }
 function setStatus(m,c){ const e=$("status"); e.textContent=m; e.className=c; }
 
 /* ── 啟動 ── */
@@ -167,19 +232,22 @@ async function boot(){
     $("head").style.display = "flex";
     if(!liff.isInClient()) $("close-btn").style.display = "none";
 
-    // 取回點數與本週completed狀態
+    const cr = await fetch(API + "?action=config");
+    CONF = await cr.json();
+    for(const k in CONF.itemKinds) counts[k] = 0;
+
     try{
       const r = await fetch(API + "?action=myRecords&userId=" + encodeURIComponent(uid));
       const d = await r.json();
       if(d.ok){
         $("pts").textContent = "目前 " + d.points + " 點・" + d.level;
-        weekDone = d.weekDone || {};
+        window.WEEK = d.week || {};
       }
-    }catch(e){}
+    }catch(e){ window.WEEK = {}; }
 
     renderTasks();
-    setStatus("✓ 已辨識身分，請選擇任務", "ok");
-    check();
+    $("form").style.display = "block";
+    setStatus("✓ 已辨識身分，請由第 1 步開始", "ok");
   }catch(err){
     setStatus("無法取得 LINE 身分\n請從 LINE 的選單重新開啟本頁\n\n" +
               (err && err.message ? err.message : err), "fail");
@@ -188,23 +256,88 @@ async function boot(){
 
 function renderTasks(){
   const box = $("tasks"); box.innerHTML = "";
-  TASKS.forEach(t=>{
+  Object.keys(CONF.tasks).forEach(k=>{
+    const cfg = CONF.tasks[k], ui = TASK_UI[k] || {};
+    const wk = (window.WEEK || {})[k] || {};
+    const full = !!wk.full;
+    const limTxt = cfg.weekly > 0
+      ? "本週 " + (wk.used || 0) + " / " + cfg.weekly + " 次"
+      : "不限次數";
     const d = document.createElement("div");
-    const done = !!weekDone[t.k];
-    d.className = "task" + (done ? " done" : "");
-    d.innerHTML = '<div class="em">'+t.em+'</div><div><div class="tt">'+t.t+
-                  (done?'（本週已完成）':'')+'</div><div class="td">'+t.d+'</div></div>';
-    if(!done) d.onclick = ()=>selTask(t.k, d);
+    d.className = "task" + (full ? " done" : "");
+    d.innerHTML = '<div class="em">'+(ui.em||"•")+'</div><div><div class="tt">'+
+      cfg.name+(full?"（本週已達上限）":"")+'</div><div class="td">'+(ui.desc||"")+
+      '</div><div class="lim">'+limTxt+'</div></div>';
+    if(!full) d.onclick = ()=>selTask(k, d);
     box.appendChild(d);
   });
 }
 
 function selTask(k, el){
-  task = k;
+  task = k; subtype = "";
   document.querySelectorAll(".task").forEach(x=>x.classList.remove("on"));
   el.classList.add("on");
-  $("store-card").style.display = (k === "A") ? "block" : "none";
+
+  const cfg = CONF.tasks[k], ui = TASK_UI[k] || {};
+  $("card-items").style.display = cfg.multi ? "block" : "none";
+  $("card-store").style.display = cfg.needStore ? "block" : "none";
+  $("card-sub").style.display   = (k === "C") ? "block" : "none";
+
+  if(cfg.multi) renderItems();
+  if(k === "C") renderSubs();
+
+  // 依任務更換照片欄位的標題與說明
+  $("lbl-p1").innerHTML = '<span class="step-no">'+(cfg.needStore?4:3)+'</span>'+(ui.p1||"主要照片（必要）");
+  $("g-p1").innerHTML   = ui.g1 || "";
+  $("lbl-p2").innerHTML = '<span class="step-no">'+(cfg.needStore?5:4)+'</span>'+(ui.p2||"佐證照片（建議）");
+  $("g-p2").innerHTML   = ui.g2 || "";
+
   check();
+}
+
+function renderSubs(){
+  const box = $("subs"); box.innerHTML = "";
+  Object.keys(CONF.subtypes).forEach(k=>{
+    const b = document.createElement("div");
+    b.className = "sub"; b.textContent = CONF.subtypes[k];
+    b.onclick = ()=>{
+      subtype = k;
+      document.querySelectorAll(".sub").forEach(x=>x.classList.remove("on"));
+      b.classList.add("on"); check();
+    };
+    box.appendChild(b);
+  });
+}
+
+function renderItems(){
+  const box = $("items"); box.innerHTML = "";
+  Object.keys(CONF.itemKinds).forEach(k=>{
+    const d = document.createElement("div");
+    d.className = "item";
+    d.innerHTML = '<div class="nm">'+CONF.itemKinds[k]+'</div>'+
+      '<div class="stepper">'+
+      '<button type="button" onclick="bump(\''+k+'\',-1)">−</button>'+
+      '<span class="n" id="n-'+k+'">'+counts[k]+'</span>'+
+      '<button type="button" onclick="bump(\''+k+'\',1)">＋</button></div>';
+    box.appendChild(d);
+  });
+  updTotal();
+}
+
+function bump(k, d){
+  const tot = Object.keys(counts).reduce((a,x)=>a+counts[x],0);
+  if(d > 0 && tot >= CONF.maxItems){
+    alert("單次最多回報 " + CONF.maxItems + " 件，請分次上傳");
+    return;
+  }
+  counts[k] = Math.max(0, counts[k] + d);
+  $("n-"+k).textContent = counts[k];
+  updTotal(); check();
+}
+
+function updTotal(){
+  const tot = Object.keys(counts).reduce((a,x)=>a+counts[x],0);
+  $("item-total").textContent = "目前 " + tot + " 件・可得 " + tot + " 點";
 }
 
 /* ── 店家查驗 ── */
@@ -218,21 +351,22 @@ function chkStore(){
     try{
       const r = await fetch(API + "?action=stores");
       const d = await r.json();
-      const hit = (d.stores||[]).find(s=>s.code === c);
+      const norm = s => /^\d+$/.test(s) ? (s.length>=3 ? s.replace(/^0+(?=\d{3})/,"") : ("00"+s).slice(-3)) : s.toUpperCase();
+      const hit = (d.stores||[]).find(s=>norm(String(s.code)) === norm(c));
       if(hit){
         storeOK = true;
         $("storename").className = "storename storeok";
         $("storename").textContent = "✓ " + hit.name;
       }else{
         $("storename").className = "storename storeng";
-        $("storename").textContent = "查無此編號，請確認貼紙";
+        $("storename").textContent = "查無此編號，請確認貼紙上的數字";
       }
     }catch(e){ storeOK = true; $("storename").textContent = ""; }
     check();
   }, 400);
 }
 
-/* ── 照片：壓縮後轉 base64 ── */
+/* ── 照片 ── */
 function pick(inp, n){
   const f = inp.files && inp.files[0];
   if(!f) return;
@@ -242,18 +376,12 @@ function pick(inp, n){
     check();
   });
 }
-
 function showImg(boxId, innerId, src){
-  const b = $(boxId);
-  b.classList.add("has");
+  $(boxId).classList.add("has");
   $(innerId).innerHTML = '<img src="'+src+'">';
 }
-
-/* 長邊縮到 1000px、品質 0.7，約 100–250KB。
-   夠清楚可辨識容器，又不會拖垮上傳。 */
 function compress(file, cb){
-  const img = new Image();
-  const rd = new FileReader();
+  const img = new Image(), rd = new FileReader();
   rd.onload = e => { img.src = e.target.result; };
   img.onload = ()=>{
     const MAX = 1000;
@@ -269,11 +397,18 @@ function compress(file, cb){
 }
 
 function check(){
-  const need = task && ph1 && (task !== "A" || storeOK);
-  $("send").disabled = !need;
+  if(!task || !ph1){ $("send").disabled = true; return; }
+  const cfg = CONF.tasks[task];
+  if(cfg.needStore && !storeOK){ $("send").disabled = true; return; }
+  if(task === "C" && !subtype){ $("send").disabled = true; return; }
+  if(cfg.multi){
+    const tot = Object.keys(counts).reduce((a,x)=>a+counts[x],0);
+    if(tot < 1){ $("send").disabled = true; return; }
+  }
+  $("send").disabled = false;
 }
 
-/* ── 送出：POST 一次送完 ── */
+/* ── 送出 ── */
 let sending = false;
 async function send(){
   if(sending) return;
@@ -282,49 +417,49 @@ async function send(){
   btn.disabled = true; btn.textContent = "上傳中…";
 
   const body = {
-    action: "submit",
-    userId: uid,
-    displayName: uname,
-    task: task,
-    storeCode: task === "A" ? $("store").value.trim() : "",
-    photoContainer: ph1,
-    photoProof: ph2,
+    action:"submit", userId:uid, displayName:uname, task:task,
+    subtype: task === "C" ? subtype : "",
+    items: CONF.tasks[task].multi ? counts : null,
+    storeCode: CONF.tasks[task].needStore ? $("store").value.trim() : "",
+    photoContainer: ph1, photoProof: ph2,
+    note: $("note").value.trim(),
     wid: Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,10)
   };
 
   try{
     const r = await fetch(API, {
-      method: "POST",
-      headers: {"Content-Type": "text/plain;charset=utf-8"},  // 避免預檢請求
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
       body: JSON.stringify(body)
     });
     const d = await r.json();
-
     if(d.ok){
       $("form").style.display = "none";
       $("status").style.display = "none";
+      $("head").style.display = "none";
       $("done").classList.add("show");
       $("done-t").textContent = d.status === "通過" ? "任務完成！" : "上傳成功";
       $("done-m").textContent = d.msg || "";
       $("done-s").textContent = d.serial ? "編號 " + d.serial : "";
     }else{
       alert(d.error || "送出失敗，請再試一次");
-      btn.disabled = false; btn.textContent = "送出";
-      sending = false;
+      btn.disabled = false; btn.textContent = "送出"; sending = false;
     }
   }catch(err){
     alert("網路連線失敗，請確認訊號後再試一次");
-    btn.disabled = false; btn.textContent = "送出";
-    sending = false;
+    btn.disabled = false; btn.textContent = "送出"; sending = false;
   }
 }
 
 function closeWin(){ if(liff.isInClient()) liff.closeWindow(); }
 
-/* 若由 QR Code 帶入店家編號：?s=001 */
+/* QR Code 帶入店家編號：?s=001 */
 (function(){
   const m = location.search.match(/[?&]s=([^&]+)/);
-  if(m){ window.addEventListener("load", ()=>{ $("store").value = decodeURIComponent(m[1]); }); }
+  if(m) window.addEventListener("load", ()=>{
+    const el = $("store");
+    if(el){ el.value = decodeURIComponent(m[1]); chkStore(); }
+  });
 })();
 
 boot();

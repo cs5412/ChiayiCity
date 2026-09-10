@@ -76,11 +76,13 @@ h2{font-size:14px;margin:0 0 11px}
 
     <div class="card">
       <h2>本週任務</h2>
+      <div style="font-size:11.5px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">顯示本週已完成次數。額度每週一重新計算。</div>
       <div class="wk" id="wk"></div>
     </div>
 
     <div class="card">
       <h2>兌換獎勵</h2>
+      <div style="font-size:11.5px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">點數足夠時按下兌換，系統會產生專屬券碼並傳到你的 LINE，至指定地點出示即可領取。</div>
       <div id="gifts"></div>
     </div>
 
@@ -99,14 +101,8 @@ const LIFF_ID = "2011533465-IUMILFYy";
 const API     = "https://script.google.com/macros/s/AKfycbytQFDvJ9aBHqrz4TgAqz4pnNfwLv4dxUgjG9pBY1WFipiCKUF5jqiHtF91HX626ZhYHQ/exec";
 /* ═════════════════════════ */
 
-/* 獎勵品項（可自行增減，cost 為所需點數）*/
-const GIFTS = [
-  {item:"二手袋",   cost:3},
-  {item:"環保杯",   cost:8},
-  {item:"環保餐盒", cost:12}
-];
-
-const TASK_NAME = {A:"自備容器", B:"旅遊自備", C:"不用品交換"};
+/* 獎勵品項由後端提供，改設定不必改前端 */
+let GIFTS = [];
 let uid = "", myPoints = 0;
 
 function $(i){ return document.getElementById(i); }
@@ -136,12 +132,15 @@ async function load(){
   $("pt").textContent = d.points;
   $("lv").textContent = d.level + "・累計通過 " + d.passCount + " 次";
 
-  $("wk").innerHTML = Object.keys(TASK_NAME).map(k=>{
-    const did = d.weekDone && d.weekDone[k];
-    return '<div class="'+(did?"did":"can")+'">'+TASK_NAME[k]+
-           '<br>'+(did?"已完成":"可上傳")+'</div>';
+  const wk = d.week || {};
+  $("wk").innerHTML = Object.keys(wk).map(k=>{
+    const w = wk[k];
+    const txt = w.limit > 0 ? (w.used + " / " + w.limit + " 次") : (w.used + " 次・不限");
+    return '<div class="'+(w.full?"did":"can")+'">'+esc(w.name)+
+           '<br>'+txt+'</div>';
   }).join("");
 
+  GIFTS = d.gifts || [];
   $("gifts").innerHTML = GIFTS.map((g,i)=>
     '<div class="gift"><div><div class="gn">'+g.item+'</div>'+
     '<div class="gc">需 '+g.cost+' 點</div></div>'+
@@ -151,10 +150,13 @@ async function load(){
   $("recs").innerHTML = d.records.length
     ? d.records.map(r=>{
         const cls = r.status==="通過" ? "s-pass" : (r.status==="退件" ? "s-rej" : "s-wait");
-        return '<div class="rec"><div><div>'+esc(r.task)+
-               (r.store?'　'+esc(r.store):'')+'</div><div class="t">'+esc(r.time)+'</div>'+
+        const extra = [r.sub, r.store, r.items].filter(Boolean).map(esc).join("　");
+        const pt = (r.status==="通過" && r.points) ? '<br>+'+r.points+' 點' : '';
+        return '<div class="rec"><div><div>'+esc(r.task)+'</div>'+
+               (extra?'<div class="t">'+extra+'</div>':'')+
+               '<div class="t">'+esc(r.time)+'</div>'+
                (r.status==="退件"&&r.reason?'<div class="rsn">'+esc(r.reason)+'</div>':'')+
-               '</div><div class="st '+cls+'">'+esc(r.status)+'</div></div>';
+               '</div><div class="st '+cls+'">'+esc(r.status)+pt+'</div></div>';
       }).join("")
     : '<div class="empty">還沒有上傳紀錄</div>';
 
@@ -177,7 +179,7 @@ async function ex(i){
     const r = await fetch(API, {
       method:"POST",
       headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body: JSON.stringify({action:"issueCode", userId:uid, item:g.item, cost:g.cost})
+      body: JSON.stringify({action:"issueCode", userId:uid, item:g.item})
     });
     const d = await r.json();
     if(d.ok){
