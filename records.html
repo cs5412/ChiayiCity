@@ -184,7 +184,9 @@ async function ex(i){
     const d = await r.json();
     if(d.ok){
       alert("兌換成功！\n\n券碼：" + d.code +
-            "\n\n請至指定地點出示券碼領取。\n券碼也已傳送到你的 LINE。");
+            "\n\n請至指定地點出示券碼領取。" +
+            (d.pushed ? "\n券碼也已傳送到你的 LINE。"
+                      : "\n請截圖保存此券碼，或到「最近上傳」查看。"));
       await load();
     }else{
       alert(d.error || "兌換失敗");
