@@ -77,7 +77,8 @@ h2{font-size:14px;margin:0 0 11px}
 .cp-act button{flex:1;padding:11px;border-radius:10px;font-size:13.5px;font-weight:700;
                border:none;cursor:pointer}
 .bcopy{background:var(--brown);color:#fff}
-.bret{background:#fff;color:var(--green);border:1.5px solid var(--green)}
+.bline{background:#06c755;color:#fff}
+.bret{background:#fff;color:var(--green);border:1.5px solid var(--green);width:100%}
 .cp-tip{font-size:11.5px;color:var(--ink2);line-height:1.6;margin-top:8px;
         background:#faf8f3;border-radius:8px;padding:9px 11px}
 .cp-tip.ok{background:#eff6ec;color:#3f6b31}
@@ -196,10 +197,12 @@ async function load(){
         let act = "";
         if(isNew){
           act = '<div class="cp-act">' +
-            '<button class="bcopy" onclick="copyCode(\''+c.code+'\')">複製兌換碼</button>' +
-            '<button class="bret" onclick="ret(\''+c.code+'\')">我已回傳</button></div>' +
-            '<div class="cp-tip">請複製上面的兌換碼，貼到本官方帳號的聊天室傳送給我們，' +
-            '再按「我已回傳」。</div>';
+            '<button class="bcopy" onclick="copyCode(\''+c.code+'\')">① 複製兌換碼</button>' +
+            '<button class="bline" onclick="openLine()">② 前往聊天室貼上</button></div>' +
+            '<div class="cp-act"><button class="bret" onclick="ret(\''+c.code+'\')">' +
+            '③ 我已回傳</button></div>' +
+            '<div class="cp-tip">依照 ①②③ 順序操作即可。貼上後記得回來按「我已回傳」，' +
+            '我們才知道要幫你核發。</div>';
         }else if(isRet){
           act = '<div class="cp-tip">已收到你的回傳，我們會盡快核發電子券，請留意聊天室訊息。</div>';
         }else if(isDone){
@@ -235,6 +238,18 @@ async function load(){
 function esc(s){
   return String(s==null?"":s).replace(/[&<>"]/g,
     c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+}
+
+const LINE_OA = "https://lin.ee/90fLchb";
+
+function openLine(){
+  try{
+    if(typeof liff !== "undefined" && liff.isInClient && liff.isInClient()){
+      liff.openWindow({ url: LINE_OA, external: false });
+      return;
+    }
+  }catch(e){}
+  window.open(LINE_OA, "_blank");
 }
 
 function copyCode(code){
