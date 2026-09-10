@@ -321,13 +321,16 @@ function selTask(k, el){
     const lab = $("einv-label");
     if(EASY){
       lab.classList.remove("off");
-      $("g-einv").innerHTML = "你已完成<b>減塑easy life 登錄</b>，本項任務若附上電子發票畫面，" +
-        "點數可獲得 <b>" + rate + " 倍</b>加成。";
+      $("g-einv").innerHTML = "✅ 你已通過<b>減塑easy life 登錄</b>，具備加成資格。<br>" +
+        "本次只要<b>上傳第二張電子發票畫面</b>並勾選下方選項，點數即可獲得 <b>" +
+        rate + " 倍</b>加成。";
     }else{
       lab.classList.add("off");
       $("einv-check").checked = false;
-      $("g-einv").innerHTML = "完成<b>減塑easy life 登錄</b>任務後，" +
-        "日後上傳電子發票畫面即可享 <b>" + rate + " 倍</b>點數加成。";
+      const st = ONCE["D"] ? "你的<b>減塑easy life 登錄</b>還在審核中，通過後即可享加成。"
+                           : "尚未完成<b>減塑easy life 登錄</b>任務。";
+      $("g-einv").innerHTML = st + "<br>通過該任務後，上傳電子發票畫面即可享 <b>" +
+        rate + " 倍</b>點數加成。";
     }
   }else{
     $("card-einv").style.display = "none";
@@ -389,11 +392,19 @@ function bump(k, d){
 function updTotal(){
   const tot = Object.keys(counts).reduce((a,x)=>a+counts[x],0);
   const rate = (CONF && CONF.bonusRate) || 1.5;
-  const bonus = EASY && $("einv-check") && $("einv-check").checked && ph2;
+  const checked = EASY && $("einv-check") && $("einv-check").checked;
+  const bonus = checked && ph2;
   const pts = bonus ? Math.round(tot * rate) : tot;
-  $("item-total").innerHTML = bonus
-    ? "目前 " + tot + " 件・可得 <b>" + pts + " 點</b>（含 " + rate + " 倍加成）"
-    : "目前 " + tot + " 件・可得 " + tot + " 點";
+  if(bonus){
+    $("item-total").innerHTML = "目前 " + tot + " 件・可得 <b>" + pts +
+      " 點</b>（含 " + rate + " 倍加成）";
+  }else if(checked && !ph2){
+    $("item-total").innerHTML = "目前 " + tot + " 件・可得 " + tot +
+      " 點<br><span style=\"font-size:11.5px;color:#c0503f;font-weight:600\">" +
+      "尚未上傳電子發票照片，加成未生效</span>";
+  }else{
+    $("item-total").textContent = "目前 " + tot + " 件・可得 " + tot + " 點";
+  }
 }
 
 /* ── 店家查驗 ── */
@@ -426,7 +437,7 @@ function pick(inp, n){
   compress(f, (dataUrl)=>{
     if(n === 1){ ph1 = dataUrl; showImg("box1","in1",dataUrl); }
     else       { ph2 = dataUrl; showImg("box2","in2",dataUrl); }
-    check();
+    check();          // 內含 updTotal，第二張照片會影響加成試算
   });
 }
 function showImg(boxId, innerId, src){
