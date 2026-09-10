@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="color-scheme" content="light only">
+<title>自備有禮｜我的紀錄</title>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<style>
+:root{
+  color-scheme:light only;
+  --cream:#f7f4ea; --card:#fff; --ink:#3d3226; --ink2:#7d7365; --ink3:#a9a196;
+  --green:#5c8a4a; --brown:#8b6f47; --red:#c0503f; --line:#e5ded0;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
+     font-family:-apple-system,"Noto Sans TC",sans-serif;line-height:1.6}
+.wrap{max-width:520px;margin:0 auto}
+
+.pt-card{
+  background:linear-gradient(135deg,#5c8a4a,#7aa563);color:#fff;
+  border-radius:16px;padding:22px;text-align:center;margin-bottom:14px;
+}
+.pt-card .n{font-size:42px;font-weight:800;line-height:1.1}
+.pt-card .u{font-size:13px;opacity:.9}
+.pt-card .lv{
+  display:inline-block;margin-top:9px;background:rgba(255,255,255,.22);
+  padding:3px 13px;border-radius:99px;font-size:12px;
+}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+      padding:16px;margin-bottom:13px}
+h2{font-size:14px;margin:0 0 11px}
+
+.wk{display:flex;gap:7px;flex-wrap:wrap}
+.wk div{flex:1;min-width:96px;text-align:center;padding:10px 6px;
+        border:1px solid var(--line);border-radius:10px;font-size:12px}
+.wk .can{border-color:var(--green);color:var(--green);font-weight:700}
+.wk .did{background:#f2f0ea;color:var(--ink3)}
+
+.rec{display:flex;justify-content:space-between;gap:10px;
+     padding:11px 0;border-bottom:1px solid #f0ece2;font-size:13px}
+.rec:last-child{border-bottom:none}
+.rec .t{font-size:11.5px;color:var(--ink3)}
+.st{font-size:11.5px;font-weight:700;white-space:nowrap;padding-top:2px}
+.s-pass{color:var(--green)} .s-wait{color:#b58a2b} .s-rej{color:var(--red)}
+.rsn{font-size:11px;color:var(--red);margin-top:2px}
+
+.gift{display:flex;justify-content:space-between;align-items:center;gap:10px;
+      padding:12px 0;border-bottom:1px solid #f0ece2}
+.gift:last-child{border-bottom:none}
+.gift .gn{font-size:13.5px;font-weight:600}
+.gift .gc{font-size:11.5px;color:var(--ink2)}
+.gift button{background:var(--green);color:#fff;border:none;border-radius:9px;
+             padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.gift button:disabled{background:#d3cfc6}
+
+.btn{width:100%;padding:14px;border:none;border-radius:12px;background:var(--brown);
+     color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px}
+.empty{text-align:center;color:var(--ink3);font-size:13px;padding:22px 0}
+#status{padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:14px}
+.loading{background:#fdf6e0;color:#8a6d00}
+.fail{background:#fbeae7;color:#a8392a}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="status" class="loading">載入中…</div>
+  <div id="body" style="display:none">
+
+    <div class="pt-card">
+      <div class="n" id="pt">0</div>
+      <div class="u">可用點數</div>
+      <div class="lv" id="lv"></div>
+    </div>
+
+    <div class="card">
+      <h2>本週任務</h2>
+      <div class="wk" id="wk"></div>
+    </div>
+
+    <div class="card">
+      <h2>兌換獎勵</h2>
+      <div id="gifts"></div>
+    </div>
+
+    <div class="card">
+      <h2>最近上傳</h2>
+      <div id="recs"></div>
+    </div>
+
+    <button class="btn" onclick="location.href='index.html'">上傳新任務</button>
+  </div>
+</div>
+
+<script>
+/* ═══ 設定：換成你自己的 ═══ */
+const LIFF_ID = "2011533465-IUMILFYy";
+const API     = "https://script.google.com/macros/s/AKfycbytQFDvJ9aBHqrz4TgAqz4pnNfwLv4dxUgjG9pBY1WFipiCKUF5jqiHtF91HX626ZhYHQ/exec";
+/* ═════════════════════════ */
+
+/* 獎勵品項（可自行增減，cost 為所需點數）*/
+const GIFTS = [
+  {item:"二手袋",   cost:3},
+  {item:"環保杯",   cost:8},
+  {item:"環保餐盒", cost:12}
+];
+
+const TASK_NAME = {A:"自備容器", B:"旅遊自備", C:"不用品交換"};
+let uid = "", myPoints = 0;
+
+function $(i){ return document.getElementById(i); }
+
+async function boot(){
+  try{
+    await liff.init({liffId: LIFF_ID});
+    if(!liff.isLoggedIn()){ liff.login({redirectUri: location.href}); return; }
+    const p = await liff.getProfile();
+    uid = p.userId;
+    await load();
+  }catch(e){
+    $("status").className = "fail";
+    $("status").textContent = "無法取得身分，請從 LINE 選單開啟本頁";
+  }
+}
+
+async function load(){
+  const r = await fetch(API + "?action=myRecords&userId=" + encodeURIComponent(uid));
+  const d = await r.json();
+  if(!d.ok){
+    $("status").className = "fail";
+    $("status").textContent = d.error || "載入失敗";
+    return;
+  }
+  myPoints = d.points;
+  $("pt").textContent = d.points;
+  $("lv").textContent = d.level + "・累計通過 " + d.passCount + " 次";
+
+  $("wk").innerHTML = Object.keys(TASK_NAME).map(k=>{
+    const did = d.weekDone && d.weekDone[k];
+    return '<div class="'+(did?"did":"can")+'">'+TASK_NAME[k]+
+           '<br>'+(did?"已完成":"可上傳")+'</div>';
+  }).join("");
+
+  $("gifts").innerHTML = GIFTS.map((g,i)=>
+    '<div class="gift"><div><div class="gn">'+g.item+'</div>'+
+    '<div class="gc">需 '+g.cost+' 點</div></div>'+
+    '<button '+(myPoints>=g.cost?"":"disabled")+' onclick="ex('+i+')">'+
+    (myPoints>=g.cost?"兌換":"點數不足")+'</button></div>').join("");
+
+  $("recs").innerHTML = d.records.length
+    ? d.records.map(r=>{
+        const cls = r.status==="通過" ? "s-pass" : (r.status==="退件" ? "s-rej" : "s-wait");
+        return '<div class="rec"><div><div>'+esc(r.task)+
+               (r.store?'　'+esc(r.store):'')+'</div><div class="t">'+esc(r.time)+'</div>'+
+               (r.status==="退件"&&r.reason?'<div class="rsn">'+esc(r.reason)+'</div>':'')+
+               '</div><div class="st '+cls+'">'+esc(r.status)+'</div></div>';
+      }).join("")
+    : '<div class="empty">還沒有上傳紀錄</div>';
+
+  $("status").style.display = "none";
+  $("body").style.display = "block";
+}
+
+function esc(s){
+  return String(s==null?"":s).replace(/[&<>"]/g,
+    c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+}
+
+let busy = false;
+async function ex(i){
+  if(busy) return;
+  const g = GIFTS[i];
+  if(!confirm("確定用 " + g.cost + " 點兌換「" + g.item + "」嗎？")) return;
+  busy = true;
+  try{
+    const r = await fetch(API, {
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body: JSON.stringify({action:"issueCode", userId:uid, item:g.item, cost:g.cost})
+    });
+    const d = await r.json();
+    if(d.ok){
+      alert("兌換成功！\n\n券碼：" + d.code +
+            "\n\n請至指定地點出示券碼領取。\n券碼也已傳送到你的 LINE。");
+      await load();
+    }else{
+      alert(d.error || "兌換失敗");
+    }
+  }catch(e){
+    alert("連線失敗，請稍後再試");
+  }
+  busy = false;
+}
+
+boot();
+</script>
+</body>
+</html>
