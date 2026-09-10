@@ -92,6 +92,13 @@ input[type=file]{display:none}
 .done-box h2{font-size:19px;margin:10px 0 5px}
 .done-box p{font-size:13.5px;color:var(--ink2);margin:0 0 6px}
 .sn{font-family:ui-monospace,monospace;font-size:11.5px;color:var(--ink3)}
+.einv{display:flex;align-items:flex-start;gap:10px;padding:13px;border:1.5px solid var(--line);
+      border-radius:11px;cursor:pointer;font-size:14px;line-height:1.55}
+.einv input{width:19px;height:19px;accent-color:var(--green);flex-shrink:0;margin-top:1px}
+.einv b{color:var(--green)}
+.einv.on{border-color:var(--green);background:var(--soft)}
+.einv.off{opacity:.5;pointer-events:none}
+.bonus-tip{font-size:12px;color:var(--green);font-weight:700;margin-top:8px}
 .step-no{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;
          background:var(--green);color:#fff;border-radius:50%;font-size:12px;margin-right:6px}
 </style>
@@ -164,6 +171,16 @@ input[type=file]{display:none}
       </label>
     </div>
 
+    <div class="card" id="card-einv" style="display:none">
+      <span class="lbl">電子發票加成</span>
+      <div class="guide" id="g-einv"></div>
+      <label class="einv" id="einv-label">
+        <input type="checkbox" id="einv-check" onchange="check()">
+        <span>我上傳的消費證明是<b>電子發票畫面</b></span>
+      </label>
+      <div class="hint">勾選後審核人員會特別確認。若照片並非電子發票，將以原始點數計算。</div>
+    </div>
+
     <div class="card">
       <span class="lbl">補充說明（選填）</span>
       <div class="guide">
@@ -210,11 +227,16 @@ const TASK_UI = {
       p1:"物品照片（必要）",
       g1:"請拍下<b>交換／購買／維修的物品</b>。維修類請盡量拍出修復後的樣子。",
       p2:"地點或單據照片（建議）",
-      g2:"據點招牌、二手市集現場、購買收據或維修單據皆可。" }
+      g2:"據點招牌、二手市集現場、購買收據或維修單據皆可。" },
+  D:{ em:"📱", desc:"完成減塑easy life 平台登錄，一次可得 5 點",
+      p1:"登錄完成截圖（必要）",
+      g1:"請至<b>減塑easy life 平台</b>完成登錄後，截取<b>顯示登錄完成的畫面</b>並上傳。畫面需可看出帳號已完成註冊。",
+      p2:"補充截圖（選填）",
+      g2:"若一張畫面看不清楚，可再附一張佐證。" }
 };
 
 let uid="", uname="", task="", subtype="", ph1="", ph2="";
-let CONF=null, counts={};
+let CONF=null, counts={}, STORES=[], ONCE={}, EASY=false;
 
 function $(i){ return document.getElementById(i); }
 function setStatus(m,c){ const e=$("status"); e.textContent=m; e.className=c; }
@@ -232,18 +254,20 @@ async function boot(){
     $("head").style.display = "flex";
     if(!liff.isInClient()) $("close-btn").style.display = "none";
 
-    const cr = await fetch(API + "?action=config");
-    CONF = await cr.json();
+    // 一次取回設定、個人紀錄與店家名單（原本要打三次）
+    const br = await fetch(API + "?action=boot&userId=" + encodeURIComponent(uid));
+    const bd = await br.json();
+    CONF = bd.config;
+    STORES = bd.stores || [];
     for(const k in CONF.itemKinds) counts[k] = 0;
-
-    try{
-      const r = await fetch(API + "?action=myRecords&userId=" + encodeURIComponent(uid));
-      const d = await r.json();
-      if(d.ok){
-        $("pts").textContent = "目前 " + d.points + " 點・" + d.level;
-        window.WEEK = d.week || {};
-      }
-    }catch(e){ window.WEEK = {}; }
+    if(bd.me && bd.me.ok){
+      $("pts").textContent = "目前 " + bd.me.points + " 點・" + bd.me.level;
+      window.WEEK = bd.me.week || {};
+      ONCE = bd.me.onceDone || {};
+      EASY = !!bd.me.easyLife;
+    }else{
+      window.WEEK = {}; ONCE = {}; EASY = false;
+    }
 
     renderTasks();
     $("form").style.display = "block";
@@ -259,14 +283,17 @@ function renderTasks(){
   Object.keys(CONF.tasks).forEach(k=>{
     const cfg = CONF.tasks[k], ui = TASK_UI[k] || {};
     const wk = (window.WEEK || {})[k] || {};
-    const full = !!wk.full;
-    const limTxt = cfg.weekly > 0
-      ? "本週 " + (wk.used || 0) + " / " + cfg.weekly + " 次"
-      : "不限次數";
+    const doneOnce = cfg.once && ONCE[k];
+    const full = !!wk.full || !!doneOnce;
+    const limTxt = cfg.once
+      ? (doneOnce ? "已完成，不可重複" : "每人限一次・" + cfg.points + " 點")
+      : (cfg.weekly > 0
+          ? "本週 " + (wk.used || 0) + " / " + cfg.weekly + " 次"
+          : "不限次數");
     const d = document.createElement("div");
     d.className = "task" + (full ? " done" : "");
     d.innerHTML = '<div class="em">'+(ui.em||"•")+'</div><div><div class="tt">'+
-      cfg.name+(full?"（本週已達上限）":"")+'</div><div class="td">'+(ui.desc||"")+
+      cfg.name+(doneOnce?"（已完成）":(full?"（本週已達上限）":""))+'</div><div class="td">'+(ui.desc||"")+
       '</div><div class="lim">'+limTxt+'</div></div>';
     if(!full) d.onclick = ()=>selTask(k, d);
     box.appendChild(d);
@@ -282,6 +309,26 @@ function selTask(k, el){
   $("card-items").style.display = cfg.multi ? "block" : "none";
   $("card-store").style.display = cfg.needStore ? "block" : "none";
   $("card-sub").style.display   = (k === "C") ? "block" : "none";
+
+  // 電子發票加成：僅「自備探險嘉」適用
+  const rate = CONF.bonusRate || 1.5;
+  if(cfg.multi){
+    $("card-einv").style.display = "block";
+    const lab = $("einv-label");
+    if(EASY){
+      lab.classList.remove("off");
+      $("g-einv").innerHTML = "你已完成<b>減塑easy life 登錄</b>，本項任務若附上電子發票畫面，" +
+        "點數可獲得 <b>" + rate + " 倍</b>加成。";
+    }else{
+      lab.classList.add("off");
+      $("einv-check").checked = false;
+      $("g-einv").innerHTML = "完成<b>減塑easy life 登錄</b>任務後，" +
+        "日後上傳電子發票畫面即可享 <b>" + rate + " 倍</b>點數加成。";
+    }
+  }else{
+    $("card-einv").style.display = "none";
+    $("einv-check").checked = false;
+  }
 
   if(cfg.multi) renderItems();
   if(k === "C") renderSubs();
@@ -337,7 +384,12 @@ function bump(k, d){
 
 function updTotal(){
   const tot = Object.keys(counts).reduce((a,x)=>a+counts[x],0);
-  $("item-total").textContent = "目前 " + tot + " 件・可得 " + tot + " 點";
+  const rate = (CONF && CONF.bonusRate) || 1.5;
+  const bonus = EASY && $("einv-check") && $("einv-check").checked && ph2;
+  const pts = bonus ? Math.round(tot * rate) : tot;
+  $("item-total").innerHTML = bonus
+    ? "目前 " + tot + " 件・可得 <b>" + pts + " 點</b>（含 " + rate + " 倍加成）"
+    : "目前 " + tot + " 件・可得 " + tot + " 點";
 }
 
 /* ── 店家查驗 ── */
@@ -347,23 +399,20 @@ function chkStore(){
   storeOK = false; check();
   const c = $("store").value.trim();
   if(!c){ $("storename").textContent = ""; return; }
-  storeTimer = setTimeout(async ()=>{
-    try{
-      const r = await fetch(API + "?action=stores");
-      const d = await r.json();
-      const norm = s => /^\d+$/.test(s) ? (s.length>=3 ? s.replace(/^0+(?=\d{3})/,"") : ("00"+s).slice(-3)) : s.toUpperCase();
-      const hit = (d.stores||[]).find(s=>norm(String(s.code)) === norm(c));
-      if(hit){
-        storeOK = true;
-        $("storename").className = "storename storeok";
-        $("storename").textContent = "✓ " + hit.name;
-      }else{
-        $("storename").className = "storename storeng";
-        $("storename").textContent = "查無此編號，請確認貼紙上的數字";
-      }
-    }catch(e){ storeOK = true; $("storename").textContent = ""; }
+  // 店家名單已於啟動時載入，直接在本機比對，不需再連線
+  storeTimer = setTimeout(()=>{
+    const norm = s => /^\d+$/.test(s) ? (s.length>=3 ? s.replace(/^0+(?=\d{3})/,"") : ("00"+s).slice(-3)) : String(s).toUpperCase();
+    const hit = STORES.find(s=>norm(String(s.code)) === norm(c));
+    if(hit){
+      storeOK = true;
+      $("storename").className = "storename storeok";
+      $("storename").textContent = "✓ " + hit.name;
+    }else{
+      $("storename").className = "storename storeng";
+      $("storename").textContent = "查無此編號，請確認貼紙上的數字";
+    }
     check();
-  }, 400);
+  }, 200);
 }
 
 /* ── 照片 ── */
@@ -397,6 +446,7 @@ function compress(file, cb){
 }
 
 function check(){
+  if(task && CONF.tasks[task] && CONF.tasks[task].multi) updTotal();
   if(!task || !ph1){ $("send").disabled = true; return; }
   const cfg = CONF.tasks[task];
   if(cfg.needStore && !storeOK){ $("send").disabled = true; return; }
@@ -422,6 +472,7 @@ async function send(){
     items: CONF.tasks[task].multi ? counts : null,
     storeCode: CONF.tasks[task].needStore ? $("store").value.trim() : "",
     photoContainer: ph1, photoProof: ph2,
+    eInvoice: $("einv-check").checked,
     note: $("note").value.trim(),
     wid: Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,10)
   };
