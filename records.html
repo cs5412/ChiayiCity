@@ -204,10 +204,13 @@ async function load(){
             '<div class="cp-tip">依照 ①②③ 順序操作即可。貼上後記得回來按「我已回傳」，' +
             '我們才知道要幫你核發。</div>';
         }else if(isRet){
-          act = '<div class="cp-tip">已收到你的回傳，我們會盡快核發電子券，請留意聊天室訊息。</div>';
+          act = '<div class="cp-tip">已收到你的回傳，我們確認後會直接在聊天室提供電子券代碼，請留意訊息。</div>';
         }else if(isDone){
-          act = '<div class="cp-tip ok">電子券已於 '+esc(c.issuedTime)+' 核發，請查看聊天室訊息。' +
-                (c.info ? '<br>'+esc(c.info) : '') + '</div>';
+          act = '<div class="cp-tip ok">電子券已於 '+esc(c.issuedTime)+' 核發，' +
+                '請查看官方帳號聊天室中我們傳送的電子券代碼。' +
+                (c.info ? '<br>'+esc(c.info) : '') +
+                '<div class="cp-act" style="margin-top:8px">' +
+                '<button class="bline" onclick="openLine()">前往聊天室查看</button></div></div>';
         }
         return '<div class="cp '+cls+'">'+
           '<div class="cp-head"><div class="ci">'+esc(c.item)+'</div>'+
