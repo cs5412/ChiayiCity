@@ -176,13 +176,16 @@ input[type=file]{display:none}
     </div>
 
     <div class="card" id="card-einv" style="display:none">
-      <span class="lbl">電子發票加成</span>
+      <span class="lbl">電子發票加成（僅限自備探險嘉）</span>
       <div class="guide" id="g-einv"></div>
       <label class="einv" id="einv-label">
         <input type="checkbox" id="einv-check" onchange="check()">
-        <span>我上傳的消費證明是<b>電子發票畫面</b></span>
+        <span>我上傳的消費證明是<b>電子發票畫面</b><br><span style="font-size:11.5px;color:#7d7365">加成僅適用「自備探險嘉」，其他任務不受影響</span></span>
       </label>
-      <div class="hint">勾選後審核人員會特別確認。若照片並非電子發票，將以原始點數計算。</div>
+      <div class="hint">
+        <b>加成只會套用在「自備探險嘉」這一次上傳的點數</b>，不影響其他任務，也不會回溯已獲得的點數。<br>
+        勾選後審核人員會確認第二張照片是否為電子發票。若不是，將以原始件數計點，不會退件。
+      </div>
     </div>
 
     <div class="card">

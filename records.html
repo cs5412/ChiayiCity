@@ -17,9 +17,20 @@ body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
      font-family:-apple-system,"Noto Sans TC",sans-serif;line-height:1.6}
 .wrap{max-width:520px;margin:0 auto}
 
-.pt-card{
+.pt-card{display:flex;align-items:center;gap:14px;text-align:left;}
+.pt-left{flex:1}
+.pt-btn{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.55);
+        color:#fff;border-radius:12px;padding:14px 16px;font-size:13.5px;font-weight:700;
+        line-height:1.5;cursor:pointer;white-space:nowrap}
+.pt-btn:active{background:rgba(255,255,255,.32)}
+.fold{display:flex;justify-content:space-between;align-items:center;cursor:pointer;
+      user-select:none;margin-bottom:0}
+.fold-i{font-size:11.5px;color:var(--ink2);font-weight:500}
+#recs.collapsed{display:none}
+#recs{margin-top:11px}
+.pt-card-orig{
   background:linear-gradient(135deg,#5c8a4a,#7aa563);color:#fff;
-  border-radius:16px;padding:22px;text-align:center;margin-bottom:14px;
+  border-radius:16px;padding:20px;margin-bottom:14px;
 }
 .pt-card .n{font-size:42px;font-weight:800;line-height:1.1}
 .pt-card .u{font-size:13px;opacity:.9}
@@ -93,9 +104,12 @@ h2{font-size:14px;margin:0 0 11px}
   <div id="body" style="display:none">
 
     <div class="pt-card">
-      <div class="n" id="pt">0</div>
-      <div class="u">可用點數</div>
-      <div class="lv" id="lv"></div>
+      <div class="pt-left">
+        <div class="n" id="pt">0</div>
+        <div class="u">可用點數</div>
+        <div class="lv" id="lv"></div>
+      </div>
+      <button class="pt-btn" onclick="location.href='index.html'">＋<br>上傳新任務</button>
     </div>
 
     <div class="card">
@@ -112,16 +126,18 @@ h2{font-size:14px;margin:0 0 11px}
 
     <div class="card">
       <h2>兌換紀錄</h2>
-      <div style="font-size:11.5px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">未核銷的券碼請於領取時出示。已核銷代表獎勵品已領取完成。</div>
+      <div style="font-size:11.5px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">兌換後請將兌換碼傳給我們，我們確認後會在聊天室提供電子券代碼。標示「已核發」代表已經發給你了。</div>
       <div id="coupons"></div>
     </div>
 
     <div class="card">
-      <h2>最近上傳</h2>
-      <div id="recs"></div>
+      <h2 class="fold" onclick="toggleRecs()">
+        <span>最近上傳</span>
+        <span class="fold-i" id="fold-i">展開 ▾</span>
+      </h2>
+      <div id="recs" class="collapsed"></div>
     </div>
 
-    <button class="btn" onclick="location.href='index.html'">上傳新任務</button>
   </div>
 </div>
 
@@ -165,9 +181,11 @@ async function load(){
   const wk = d.week || {};
   $("wk").innerHTML = Object.keys(wk).map(k=>{
     const w = wk[k];
-    const txt = w.limit > 0 ? (w.used + " / " + w.limit + " 次") : (w.used + " 次・不限");
-    return '<div class="'+(w.full?"did":"can")+'">'+esc(w.name)+
-           '<br>'+txt+'</div>';
+    let txt;
+    if(w.once)          txt = w.done ? "已完成" : "尚未完成";
+    else if(w.limit > 0) txt = w.used + " / " + w.limit + " 次";
+    else                 txt = "本週 " + w.used + " 次";
+    return '<div class="'+(w.full?"did":"can")+'">'+esc(w.name)+'<br>'+txt+'</div>';
   }).join("");
 
   GIFTS = d.gifts || [];
@@ -206,16 +224,17 @@ async function load(){
         }else if(isRet){
           act = '<div class="cp-tip">已收到你的回傳，我們確認後會直接在聊天室提供電子券代碼，請留意訊息。</div>';
         }else if(isDone){
-          act = '<div class="cp-tip ok">電子券已於 '+esc(c.issuedTime)+' 核發，' +
-                '請查看官方帳號聊天室中我們傳送的電子券代碼。' +
-                (c.info ? '<br>'+esc(c.info) : '') +
-                '<div class="cp-act" style="margin-top:8px">' +
-                '<button class="bline" onclick="openLine()">前往聊天室查看</button></div></div>';
+          act = '<div class="cp-tip ok">電子券已於 '+esc(c.issuedTime)+' 核發。' +
+                (c.info ? '<br>'+esc(c.info) : '') + '</div>' +
+                '<div class="cp-act"><button class="bline" style="width:100%" ' +
+                'onclick="openLine()">前往聊天室領取電子券代碼</button></div>';
         }
+        // 已核發者不再顯示兌換碼，避免與電子券代碼混淆
+        const codeLine = isDone ? '' : '<div class="cc">'+esc(c.code)+'</div>';
         return '<div class="cp '+cls+'">'+
           '<div class="cp-head"><div class="ci">'+esc(c.item)+'</div>'+
           '<div class="cpst '+cls+'">'+esc(st)+'</div></div>'+
-          '<div class="cc">'+esc(c.code)+'</div>'+
+          codeLine +
           '<div class="ct">'+esc(c.time)+'　'+c.cost+' 點</div>'+
           steps + act + '</div>';
       }).join("")
@@ -253,6 +272,12 @@ function openLine(){
     }
   }catch(e){}
   window.open(LINE_OA, "_blank");
+}
+
+function toggleRecs(){
+  const el = $("recs"), ic = $("fold-i");
+  const hidden = el.classList.toggle("collapsed");
+  ic.textContent = hidden ? "展開 ▾" : "收起 ▴";
 }
 
 function copyCode(code){
