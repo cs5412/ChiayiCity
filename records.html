@@ -17,6 +17,10 @@ body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
      font-family:-apple-system,"Noto Sans TC",sans-serif;line-height:1.6}
 .wrap{max-width:520px;margin:0 auto}
 
+#status{padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:14px;white-space:pre-wrap}
+.loading{background:#fdf6e0;color:#8a6d00}
+.fail{background:#fbeae7;color:#a8392a}
+
 .pt-card{
   display:flex;align-items:center;gap:14px;
   background:#5c8a4a;
@@ -74,8 +78,6 @@ h2{font-size:14px;margin:0 0 11px}
              padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
 .gift button:disabled{background:#d3cfc6}
 
-.btn{width:100%;padding:14px;border:none;border-radius:12px;background:var(--brown);
-     color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px}
 .empty{text-align:center;color:var(--ink3);font-size:13px;padding:22px 0}
 .cp{padding:14px 0;border-bottom:1px solid #f0ece2}
 .cp:last-child{border-bottom:none}
@@ -89,6 +91,8 @@ h2{font-size:14px;margin:0 0 11px}
 .cpst.cp-new{background:#fdf3e0;color:#8a6516}
 .cpst.cp-ret{background:#e6eff7;color:#2f5f8f}
 .cpst.cp-done{background:#eaf3e5;color:#3f6b31}
+.cpst.cp-void{background:#f2efe8;color:#8a8378}
+.cp.cp-void{opacity:.7}
 .steps{display:flex;gap:6px;margin:9px 0 8px;flex-wrap:wrap}
 .steps span{font-size:11px;padding:3px 9px;border-radius:99px;background:#f2efe8;color:#b0a99e}
 .steps span.on{background:var(--green);color:#fff;font-weight:700}
@@ -160,9 +164,19 @@ const API     = "https://script.google.com/macros/s/AKfycbytQFDvJ9aBHqrz4TgAqz4p
 
 /* 獎勵品項由後端提供，改設定不必改前端 */
 let GIFTS = [];
-let uid = "", uname = "", myPoints = 0;
+let uid = "", uname = "", idToken = "", myPoints = 0;
 
 function $(i){ return document.getElementById(i); }
+
+/** 一律走 POST 並帶上 ID Token，後端會以驗證結果為準，不採信前端送的 userId */
+async function api(body){
+  const r = await fetch(API, {
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body: JSON.stringify(Object.assign({userId:uid, idToken:idToken}, body))
+  });
+  return await r.json();
+}
 
 async function boot(){
   try{
@@ -170,6 +184,7 @@ async function boot(){
     if(!liff.isLoggedIn()){ liff.login({redirectUri: location.href}); return; }
     const p = await liff.getProfile();
     uid = p.userId; uname = p.displayName;
+    try{ idToken = liff.getIDToken() || ""; }catch(e){ idToken = ""; }
     await load();
   }catch(e){
     $("status").className = "fail";
@@ -178,8 +193,13 @@ async function boot(){
 }
 
 async function load(){
-  const r = await fetch(API + "?action=myRecords&userId=" + encodeURIComponent(uid));
-  const d = await r.json();
+  let d;
+  try{ d = await api({action:"myRecords"}); }
+  catch(e){
+    $("status").className = "fail";
+    $("status").textContent = "連線失敗，請稍後再試";
+    return;
+  }
   if(!d.ok){
     $("status").className = "fail";
     $("status").textContent = d.error || "載入失敗";
@@ -193,7 +213,7 @@ async function load(){
   $("wk").innerHTML = Object.keys(wk).map(k=>{
     const w = wk[k];
     let txt;
-    if(w.once)          txt = w.done ? "已完成" : "尚未完成";
+    if(w.once)           txt = w.done ? "已完成" : "尚未完成";
     else if(w.limit > 0) txt = w.used + " / " + w.limit + " 次";
     else                 txt = "本週 " + w.used + " 次";
     return '<div class="'+(w.full?"did":"can")+'">'+esc(w.name)+'<br>'+txt+'</div>';
@@ -213,20 +233,35 @@ async function load(){
 
   const cps = d.coupons || [];
   $("coupons").innerHTML = cps.length
-    ? cps.map((c,i)=>{
+    ? cps.map(c=>{
         const st = c.status;
         const isNew  = st === "已兌換";
         const isRet  = st === "已回傳";
         const isDone = st === "已核發";
-        const cls = isDone ? "cp-done" : (isRet ? "cp-ret" : "cp-new");
+        const isVoid = st === "已作廢";
+        const cls = isVoid ? "cp-void"
+                  : isDone ? "cp-done"
+                  : (isRet ? "cp-ret" : "cp-new");
+
+        // 已作廢：不顯示流程，只說明狀況
+        if(isVoid){
+          return '<div class="cp cp-void">'+
+            '<div class="cp-head"><div class="ci">'+esc(c.item)+'</div>'+
+            '<div class="cpst cp-void">'+esc(st)+'</div></div>'+
+            '<div class="ct">'+esc(c.time)+'　'+c.cost+' 點</div>'+
+            '<div class="cp-tip">這筆兌換已取消，'+c.cost+' 點已退回你的帳戶。'+
+            (c.info ? '<br>'+esc(c.info) : '')+'</div></div>';
+        }
+
         // 已核發時，第三格直接變成可點的按鈕，點了就去聊天室拿代碼
         const step3 = isDone
           ? '<button class="step-go" onclick="openLine()">③ 已核發・前往聊天室領取 ›</button>'
           : '<span>③ 已核發</span>';
-        let steps = '<div class="steps">' +
+        const steps = '<div class="steps">' +
           '<span class="on">① 已兌換</span>' +
           '<span class="'+((isRet||isDone)?"on":"")+'">② 已回傳</span>' +
           step3 + '</div>';
+
         let act = "";
         if(isNew){
           act = '<div class="cp-act">' +
@@ -243,6 +278,7 @@ async function load(){
           act = '<div class="cp-tip ok">電子券已於 '+esc(c.issuedTime)+' 核發，' +
                 '請至聊天室查看代碼。</div>';
         }
+
         // 已核發者不再顯示兌換碼，避免與電子券代碼混淆
         const codeLine = isDone ? '' : '<div class="cc">'+esc(c.code)+'</div>';
         return '<div class="cp '+cls+'">'+
@@ -305,11 +341,7 @@ function copyCode(code){
 async function ret(code){
   if(!confirm("確認你已經把兌換碼傳送給我們了嗎？")) return;
   try{
-    const r = await fetch(API, {
-      method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body: JSON.stringify({action:"markReturned", userId:uid, code:code})
-    });
-    const d = await r.json();
+    const d = await api({action:"markReturned", code:code});
     if(d.ok){ alert(d.already ? "先前已標記過了" : "已記錄，我們會盡快核發電子券"); await load(); }
     else alert(d.error || "操作失敗");
   }catch(e){ alert("連線失敗，請稍後再試"); }
@@ -322,12 +354,7 @@ async function ex(i){
   if(!confirm("確定用 " + g.cost + " 點兌換「" + g.item + "」嗎？")) return;
   busy = true;
   try{
-    const r = await fetch(API, {
-      method:"POST",
-      headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body: JSON.stringify({action:"issueCode", userId:uid, displayName:uname, item:g.item})
-    });
-    const d = await r.json();
+    const d = await api({action:"issueCode", displayName:uname, item:g.item});
     if(d.ok){
       alert("兌換成功！\n\n兌換碼：" + d.code +
             "\n\n請將此兌換碼複製後，貼到本官方帳號的聊天室傳送給我們，" +

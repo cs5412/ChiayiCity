@@ -62,6 +62,8 @@ body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
 .stepper .n{min-width:24px;text-align:center;font-size:16px;font-weight:700}
 .total{margin-top:11px;padding:10px;background:var(--soft);border-radius:9px;
        text-align:center;font-size:13.5px;font-weight:700;color:var(--green)}
+.total .warn{display:block;font-size:11.5px;color:var(--red);font-weight:600;margin-top:2px}
+.total .calm{display:block;font-size:11.5px;color:var(--ink2);font-weight:500;margin-top:2px}
 
 input[type=text]{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;
                  background:#fff;color:var(--ink);font-size:15px;outline:none}
@@ -182,10 +184,7 @@ input[type=file]{display:none}
         <input type="checkbox" id="einv-check" onchange="check()">
         <span>我上傳的消費證明是<b>電子發票畫面</b><br><span style="font-size:11.5px;color:#7d7365">加成僅適用「自備探險嘉」，其他任務不受影響</span></span>
       </label>
-      <div class="hint">
-        <b>加成只會套用在「自備探險嘉」這一次上傳的點數</b>，不影響其他任務，也不會回溯已獲得的點數。<br>
-        勾選後審核人員會確認第二張照片是否為電子發票。若不是，將以原始件數計點，不會退件。
-      </div>
+      <div class="hint" id="einv-hint"></div>
     </div>
 
     <div class="card">
@@ -242,11 +241,21 @@ const TASK_UI = {
       g2:"若一張畫面看不清楚，可再附一張佐證。" }
 };
 
-let uid="", uname="", task="", subtype="", ph1="", ph2="";
+let uid="", uname="", idToken="", task="", subtype="", ph1="", ph2="";
 let CONF=null, counts={}, STORES=[], ONCE={}, EASY=false;
 
 function $(i){ return document.getElementById(i); }
 function setStatus(m,c){ const e=$("status"); e.textContent=m; e.className=c; }
+
+/** 所有寫入與個人資料請求都走 POST，並帶上 ID Token 供後端驗證身分 */
+async function api(body){
+  const r = await fetch(API, {
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body: JSON.stringify(Object.assign({userId:uid, idToken:idToken}, body))
+  });
+  return await r.json();
+}
 
 /* ── 啟動 ── */
 async function boot(){
@@ -256,14 +265,17 @@ async function boot(){
 
     const p = await liff.getProfile();
     uid = p.userId; uname = p.displayName;
+    try{ idToken = liff.getIDToken() || ""; }catch(e){ idToken = ""; }
+
     $("who").textContent = uname;
     if(p.pictureUrl) $("ava").src = p.pictureUrl;
     $("head").style.display = "flex";
     if(!liff.isInClient()) $("close-btn").style.display = "none";
 
     // 一次取回設定、個人紀錄與店家名單（原本要打三次）
-    const br = await fetch(API + "?action=boot&userId=" + encodeURIComponent(uid));
-    const bd = await br.json();
+    const bd = await api({action:"boot", displayName:uname});
+    if(!bd.ok){ setStatus(bd.error || "載入失敗", "fail"); return; }
+
     CONF = bd.config;
     STORES = bd.stores || [];
     for(const k in CONF.itemKinds) counts[k] = 0;
@@ -318,7 +330,7 @@ function selTask(k, el){
   $("card-sub").style.display   = (k === "C") ? "block" : "none";
 
   // 電子發票加成：僅「自備探險嘉」適用
-  const rate = CONF.bonusRate || 1.5;
+  const rate = (CONF && CONF.bonusRate) || 1.5;
   if(cfg.multi){
     $("card-einv").style.display = "block";
     const lab = $("einv-label");
@@ -335,6 +347,11 @@ function selTask(k, el){
       $("g-einv").innerHTML = st + "<br>通過該任務後，上傳電子發票畫面即可享 <b>" +
         rate + " 倍</b>點數加成。";
     }
+    $("einv-hint").innerHTML =
+      "<b>加成只會套用在「自備探險嘉」這一次上傳的點數</b>，不影響其他任務，也不會回溯已獲得的點數。<br>" +
+      "加成後不滿 1 點的部分會捨去，因此<b>需 2 件以上才看得到加成</b>（例：2 件 × " + rate +
+      " ＝ 3 點；3 件 × " + rate + " ＝ 4.5，實得 4 點）。<br>" +
+      "勾選後審核人員會確認第二張照片是否為電子發票。若不是，將以原始件數計點，不會退件。";
   }else{
     $("card-einv").style.display = "none";
     $("einv-check").checked = false;
@@ -392,22 +409,42 @@ function bump(k, d){
   updTotal(); check();
 }
 
+/** 與後端 bonusPoints() 同一套規則，前後台顯示必須一致 */
+function calcBonus(tot){
+  const rate = (CONF && CONF.bonusRate) || 1.5;
+  const mode = (CONF && CONF.bonusRound) || "floor";
+  const raw = tot * rate;
+  if(mode === "ceil")  return Math.ceil(raw);
+  if(mode === "round") return Math.round(raw);
+  return Math.floor(raw);
+}
+
 function updTotal(){
-  const tot = Object.keys(counts).reduce((a,x)=>a+counts[x],0);
+  const tot  = Object.keys(counts).reduce((a,x)=>a+counts[x],0);
   const rate = (CONF && CONF.bonusRate) || 1.5;
   const checked = EASY && $("einv-check") && $("einv-check").checked;
-  const bonus = checked && ph2;
-  const pts = bonus ? Math.round(tot * rate) : tot;
-  if(bonus){
-    $("item-total").innerHTML = "目前 " + tot + " 件・可得 <b>" + pts +
-      " 點</b>（含 " + rate + " 倍加成）";
-  }else if(checked && !ph2){
-    $("item-total").innerHTML = "目前 " + tot + " 件・可得 " + tot +
-      " 點<br><span style=\"font-size:11.5px;color:#c0503f;font-weight:600\">" +
-      "尚未上傳電子發票照片，加成未生效</span>";
-  }else{
-    $("item-total").textContent = "目前 " + tot + " 件・可得 " + tot + " 點";
+  const el = $("item-total");
+
+  if(checked && !ph2){
+    el.innerHTML = "目前 " + tot + " 件・可得 " + tot + " 點" +
+      '<span class="warn">尚未上傳電子發票照片，加成未生效</span>';
+    return;
   }
+  if(checked && ph2){
+    const pts = calcBonus(tot);
+    if(pts > tot){
+      const raw = (tot * rate).toFixed(1).replace(/\.0$/,"");
+      el.innerHTML = "目前 " + tot + " 件・可得 <b>" + pts + " 點</b>" +
+        '<span class="calm">' + tot + " 件 × " + rate + " ＝ " + raw +
+        (raw !== String(pts) ? "，未滿 1 點捨去" : "") + '</span>';
+    }else{
+      el.innerHTML = "目前 " + tot + " 件・可得 " + tot + " 點" +
+        '<span class="calm">' + tot + " 件 × " + rate + " 捨去後仍為 " + tot +
+        " 點，2 件以上才看得到加成</span>";
+    }
+    return;
+  }
+  el.textContent = "目前 " + tot + " 件・可得 " + tot + " 點";
 }
 
 /* ── 店家查驗 ── */
@@ -484,24 +521,18 @@ async function send(){
   const btn = $("send");
   btn.disabled = true; btn.textContent = "上傳中…";
 
-  const body = {
-    action:"submit", userId:uid, displayName:uname, task:task,
-    subtype: task === "C" ? subtype : "",
-    items: CONF.tasks[task].multi ? counts : null,
-    storeCode: CONF.tasks[task].needStore ? $("store").value.trim() : "",
-    photoContainer: ph1, photoProof: ph2,
-    eInvoice: $("einv-check").checked,
-    note: $("note").value.trim(),
-    wid: Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,10)
-  };
-
   try{
-    const r = await fetch(API, {
-      method:"POST",
-      headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body: JSON.stringify(body)
+    const d = await api({
+      action:"submit", displayName:uname, task:task,
+      subtype: task === "C" ? subtype : "",
+      items: CONF.tasks[task].multi ? counts : null,
+      storeCode: CONF.tasks[task].needStore ? $("store").value.trim() : "",
+      photoContainer: ph1, photoProof: ph2,
+      eInvoice: $("einv-check").checked,
+      note: $("note").value.trim(),
+      wid: Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,10)
     });
-    const d = await r.json();
+
     if(d.ok){
       $("form").style.display = "none";
       $("status").style.display = "none";
