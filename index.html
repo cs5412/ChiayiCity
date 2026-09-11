@@ -302,17 +302,23 @@ function renderTasks(){
   Object.keys(CONF.tasks).forEach(k=>{
     const cfg = CONF.tasks[k], ui = TASK_UI[k] || {};
     const wk = (window.WEEK || {})[k] || {};
-    const doneOnce = cfg.once && ONCE[k];
+    // 一次性任務要分辨「審核中」與「已完成」，兩者都不能重複上傳，
+    // 但說成已完成會讓民眾以為點數已經入帳
+    const st = wk.status || "";              // '' | '待審' | '通過'
+    const doneOnce = cfg.once && !!st;
+    const passedOnce = cfg.once && st === "通過";
     const full = !!wk.full || !!doneOnce;
     const limTxt = cfg.once
-      ? (doneOnce ? "已完成，不可重複" : "每人限一次・" + cfg.points + " 點")
+      ? (passedOnce ? "已完成，不可重複"
+        : st ? "審核中，通過後可得 " + cfg.points + " 點"
+             : "每人限一次・" + cfg.points + " 點")
       : (cfg.weekly > 0
           ? "本週 " + (wk.used || 0) + " / " + cfg.weekly + " 次"
           : "不限次數");
     const d = document.createElement("div");
     d.className = "task" + (full ? " done" : "");
     d.innerHTML = '<div class="em">'+(ui.em||"•")+'</div><div><div class="tt">'+
-      cfg.name+(doneOnce?"（已完成）":(full?"（本週已達上限）":""))+'</div><div class="td">'+(ui.desc||"")+
+      cfg.name+(passedOnce?"（已完成）":(doneOnce?"（審核中）":(full?"（本週已達上限）":"")))+'</div><div class="td">'+(ui.desc||"")+
       '</div><div class="lim">'+limTxt+'</div></div>';
     if(!full) d.onclick = ()=>selTask(k, d);
     box.appendChild(d);
@@ -342,8 +348,9 @@ function selTask(k, el){
     }else{
       lab.classList.add("off");
       $("einv-check").checked = false;
-      const st = ONCE["D"] ? "你的<b>減塑easy life 登錄</b>還在審核中，通過後即可享加成。"
-                           : "尚未完成<b>減塑easy life 登錄</b>任務。";
+      const dst = ((window.WEEK || {})["D"] || {}).status || "";
+      const st = dst ? "你的<b>減塑easy life 登錄</b>還在審核中，通過後即可享加成。"
+                     : "尚未完成<b>減塑easy life 登錄</b>任務。";
       $("g-einv").innerHTML = st + "<br>通過該任務後，上傳電子發票畫面即可享 <b>" +
         rate + " 倍</b>點數加成。";
     }

@@ -213,7 +213,8 @@ async function load(){
   $("wk").innerHTML = Object.keys(wk).map(k=>{
     const w = wk[k];
     let txt;
-    if(w.once)           txt = w.done ? "已完成" : "尚未完成";
+    if(w.once)           txt = w.status === "通過" ? "已完成"
+                             : (w.status ? "審核中" : "尚未完成");
     else if(w.limit > 0) txt = w.used + " / " + w.limit + " 次";
     else                 txt = "本週 " + w.used + " 次";
     return '<div class="'+(w.full?"did":"can")+'">'+esc(w.name)+'<br>'+txt+'</div>';
