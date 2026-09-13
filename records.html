@@ -198,7 +198,7 @@ h2{font-size:14px;margin:0 0 11px}
 const LIFF_ID = "2011533465-IUMILFYy";
 const API     = "https://script.google.com/macros/s/AKfycbytQFDvJ9aBHqrz4TgAqz4pnNfwLv4dxUgjG9pBY1WFipiCKUF5jqiHtF91HX626ZhYHQ/exec";
 /* 改這支檔案時，要與 Code.gs 的 CFG.CLIENT_VERSION 改成同一個值 */
-const VERSION = "2026-09-13a";
+const VERSION = "2026-09-13b";
 /* ═════════════════════════ */
 
 /* 獎勵品項由後端提供，改設定不必改前端 */
@@ -240,27 +240,47 @@ function bootDone(){ if(bootTimer){ clearInterval(bootTimer); bootTimer = null; 
    對 WebView 來說那是另一個網址，一定會重抓。
    重載過一次仍對不上就停下來，避免無限迴圈。            ── */
 function checkVersion(serverVer){
-  if(!serverVer || serverVer === VERSION){
-    try{ sessionStorage.removeItem("vtry"); }catch(e){}
-    return true;
-  }
-  let tried = "";
-  try{ tried = sessionStorage.getItem("vtry") || ""; }catch(e){}
-  if(tried === serverVer){
-    setStatus("頁面版本較舊（本頁 " + VERSION + "，最新 " + serverVer + "）。\n" +
-              "請完全關閉這個頁面，再從 LINE 選單重新開啟一次。", "fail");
+  if(!serverVer || serverVer === VERSION) return true;
+
+  // 防迴圈記號放在網址裡（?vt=1），不放 sessionStorage。
+  // LINE 的內建瀏覽器在換網址時常會清掉 storage，記號一旦遺失就會無限重載，
+  // 畫面停在全白。網址參數一定帶得過去，所以只會重載一次。
+  let tried = false;
+  try{ tried = new URLSearchParams(location.search).get("vt") === "1"; }catch(e){}
+
+  if(tried){
+    setStatus("頁面版本較舊（本頁 " + VERSION + "，後端 " + serverVer + "）。\n\n" +
+              "多半是 Apps Script 改了程式但沒有重新部署，\n" +
+              "或三個版本號沒有改成一致。\n\n" +
+              "民眾若看到此畫面，請關閉後從 LINE 選單重新開啟。", "fail");
     return false;
   }
-  try{ sessionStorage.setItem("vtry", serverVer); }catch(e){}
   try{
     const u = new URL(location.href);
     u.searchParams.set("v", serverVer);   // 保留 ?s=001 之類原有參數
+    u.searchParams.set("vt", "1");        // 標記已經重載過一次
     location.replace(u.toString());
   }catch(e){
-    location.replace(location.pathname + "?v=" + encodeURIComponent(serverVer));
+    location.replace(location.pathname +
+      "?v=" + encodeURIComponent(serverVer) + "&vt=1");
   }
   return false;
 }
+
+/* 未捕捉的錯誤改成顯示文字，不要留下無從判斷的白畫面 */
+window.addEventListener("error", function(ev){
+  try{
+    setStatus("頁面發生錯誤，無法載入。\n\n" +
+              (ev.message || "") + "\n\n請關閉後重新開啟，若持續發生請告知承辦人員。", "fail");
+  }catch(e){}
+});
+window.addEventListener("unhandledrejection", function(ev){
+  try{
+    const r = ev.reason;
+    setStatus("連線發生問題，無法載入。\n\n" +
+              ((r && (r.message || r)) || "") + "\n\n請稍後再試一次。", "fail");
+  }catch(e){}
+});
 
 /** 跨頁時把版本號帶著走，否則第二頁又會吃到舊的 */
 function go(path){
