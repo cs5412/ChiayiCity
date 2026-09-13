@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name="color-scheme" content="light only">
 <title>源頭減量行為獎勵系統｜我的紀錄</title>
+<link rel="preconnect" href="https://static.line-scdn.net" crossorigin>
+<link rel="preconnect" href="https://script.google.com" crossorigin>
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
 :root{
@@ -18,6 +21,26 @@ body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
 .wrap{max-width:520px;margin:0 auto}
 
 #status{padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:14px;white-space:pre-wrap}
+#boot{padding:34px 18px 30px;text-align:center}
+.ring{width:34px;height:34px;margin:0 auto 14px;border-radius:50%;
+      border:3px solid #e5ded0;border-top-color:var(--green);
+      animation:spin .85s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.boot-tx{font-size:14px;font-weight:700;color:var(--ink)}
+.boot-sub{font-size:12px;color:var(--ink2);margin-top:4px;min-height:18px}
+.boot-bar{width:170px;height:3px;margin:15px auto 0;background:#e5ded0;
+          border-radius:99px;overflow:hidden}
+.boot-bar i{display:block;height:100%;width:8%;background:var(--green);
+            border-radius:99px;transition:width .5s ease}
+.sk{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:16px;margin-bottom:13px}
+.sk.big{height:96px;background:#ece7db;border:none}
+.sk-row{height:13px;border-radius:99px;margin:9px 0;
+        background:linear-gradient(90deg,#efeade 25%,#f7f4ea 37%,#efeade 63%);
+        background-size:400% 100%;animation:sheen 1.5s ease-in-out infinite}
+.sk-row.w40{width:40%} .sk-row.w70{width:70%} .sk-row.tall{height:42px;border-radius:11px}
+@keyframes sheen{0%{background-position:100% 50%}100%{background-position:0 50%}}
+@media (prefers-reduced-motion:reduce){.ring{animation-duration:2s}.sk-row{animation:none}}
 .loading{background:#fdf6e0;color:#8a6d00}
 .fail{background:#fbeae7;color:#a8392a}
 
@@ -115,7 +138,21 @@ h2{font-size:14px;margin:0 0 11px}
 </head>
 <body>
 <div class="wrap">
-  <div id="status" class="loading">載入中…</div>
+  <div id="status" class="loading" style="display:none"></div>
+
+  <div id="boot">
+    <div class="ring"></div>
+    <div class="boot-tx" id="boot-tx">正在連線…</div>
+    <div class="boot-sub" id="boot-sub">第一次開啟需要幾秒鐘</div>
+    <div class="boot-bar"><i id="boot-bar-i"></i></div>
+  </div>
+
+  <div id="skeleton">
+    <div class="sk big"></div>
+    <div class="sk"><div class="sk-row w40"></div><div class="sk-row tall"></div></div>
+    <div class="sk"><div class="sk-row w40"></div><div class="sk-row w70"></div>
+      <div class="sk-row tall"></div></div>
+  </div>
   <div id="body" style="display:none">
 
     <div class="pt-card">
@@ -124,7 +161,7 @@ h2{font-size:14px;margin:0 0 11px}
         <div class="u">可用點數</div>
         <div class="lv" id="lv"></div>
       </div>
-      <button class="pt-btn" onclick="location.href='index.html'"><span class="pl">＋</span>上傳任務</button>
+      <button class="pt-btn" onclick="go('index.html')"><span class="pl">＋</span>上傳任務</button>
     </div>
 
     <div class="card">
@@ -160,6 +197,8 @@ h2{font-size:14px;margin:0 0 11px}
 /* ═══ 設定：換成你自己的 ═══ */
 const LIFF_ID = "2011533465-IUMILFYy";
 const API     = "https://script.google.com/macros/s/AKfycbytQFDvJ9aBHqrz4TgAqz4pnNfwLv4dxUgjG9pBY1WFipiCKUF5jqiHtF91HX626ZhYHQ/exec";
+/* 改這支檔案時，要與 Code.gs 的 CFG.CLIENT_VERSION 改成同一個值 */
+const VERSION = "2026-09-13a";
 /* ═════════════════════════ */
 
 /* 獎勵品項由後端提供，改設定不必改前端 */
@@ -167,6 +206,67 @@ let GIFTS = [];
 let uid = "", uname = "", idToken = "", myPoints = 0;
 
 function $(i){ return document.getElementById(i); }
+function setStatus(m,c){
+  bootDone();
+  const b=$("boot"), k=$("skeleton");
+  if(b) b.style.display="none";
+  if(k) k.style.display="none";
+  const e=$("status"); e.style.display=""; e.textContent=m; e.className=c;
+}
+
+const BOOT_STEPS = [
+  [12, "正在連線…",  "第一次開啟需要幾秒鐘"],
+  [40, "已辨識身分", "正在讀取你的點數與兌換紀錄"],
+  [72, "快好了…",    "整理資料中"],
+  [100,"完成",       ""]
+];
+let bootTimer = null;
+function bootStep(i){
+  const s = BOOT_STEPS[i]; if(!s) return;
+  const bar = $("boot-bar-i"), tx = $("boot-tx"), sub = $("boot-sub");
+  if(bar) bar.style.width = s[0] + "%";
+  if(tx)  tx.textContent  = s[1];
+  if(sub) sub.textContent = s[2];
+}
+function bootAutoAdvance(){
+  let i = 0; bootStep(0);
+  bootTimer = setInterval(()=>{ if(i < 2) bootStep(++i); }, 1400);
+}
+function bootDone(){ if(bootTimer){ clearInterval(bootTimer); bootTimer = null; } }
+
+/* ── 版本握手 ────────────────────────────────────────────────
+   POST 請求不會被快取，所以後端回傳的版本號一定是最新的。
+   拿它跟本頁內嵌的 VERSION 比對，不一致就帶著新版號重新載入，
+   對 WebView 來說那是另一個網址，一定會重抓。
+   重載過一次仍對不上就停下來，避免無限迴圈。            ── */
+function checkVersion(serverVer){
+  if(!serverVer || serverVer === VERSION){
+    try{ sessionStorage.removeItem("vtry"); }catch(e){}
+    return true;
+  }
+  let tried = "";
+  try{ tried = sessionStorage.getItem("vtry") || ""; }catch(e){}
+  if(tried === serverVer){
+    setStatus("頁面版本較舊（本頁 " + VERSION + "，最新 " + serverVer + "）。\n" +
+              "請完全關閉這個頁面，再從 LINE 選單重新開啟一次。", "fail");
+    return false;
+  }
+  try{ sessionStorage.setItem("vtry", serverVer); }catch(e){}
+  try{
+    const u = new URL(location.href);
+    u.searchParams.set("v", serverVer);   // 保留 ?s=001 之類原有參數
+    location.replace(u.toString());
+  }catch(e){
+    location.replace(location.pathname + "?v=" + encodeURIComponent(serverVer));
+  }
+  return false;
+}
+
+/** 跨頁時把版本號帶著走，否則第二頁又會吃到舊的 */
+function go(path){
+  location.href = path + "?v=" + encodeURIComponent(VERSION);
+}
+
 
 /** 一律走 POST 並帶上 ID Token，後端會以驗證結果為準，不採信前端送的 userId */
 async function api(body){
@@ -180,15 +280,18 @@ async function api(body){
 
 async function boot(){
   try{
+    // 趁 LIFF 初始化的空檔先叫醒 Apps Script，避免冷啟動壓在關鍵路徑上
+    try{ fetch(API + "?action=ping", {mode:"no-cors", cache:"no-store"}); }catch(e){}
+    bootAutoAdvance();
     await liff.init({liffId: LIFF_ID});
     if(!liff.isLoggedIn()){ liff.login({redirectUri: location.href}); return; }
     const p = await liff.getProfile();
     uid = p.userId; uname = p.displayName;
     try{ idToken = liff.getIDToken() || ""; }catch(e){ idToken = ""; }
+    bootStep(1);
     await load();
   }catch(e){
-    $("status").className = "fail";
-    $("status").textContent = "無法取得身分，請從 LINE 選單開啟本頁";
+    setStatus("無法取得身分，請從 LINE 選單開啟本頁", "fail");
   }
 }
 
@@ -196,15 +299,15 @@ async function load(){
   let d;
   try{ d = await api({action:"myRecords"}); }
   catch(e){
-    $("status").className = "fail";
-    $("status").textContent = "連線失敗，請稍後再試";
+    setStatus("連線失敗，請稍後再試", "fail");
     return;
   }
   if(!d.ok){
-    $("status").className = "fail";
-    $("status").textContent = d.error || "載入失敗";
+    setStatus(d.error || "載入失敗", "fail");
     return;
   }
+  if(!checkVersion(d.clientVersion)) return;
+  bootStep(2);
   myPoints = d.points;
   $("pt").textContent = d.points;
   $("lv").textContent = d.level + "・累計通過 " + d.passCount + " 次";
@@ -304,6 +407,10 @@ async function load(){
       }).join("")
     : '<div class="empty">還沒有上傳紀錄</div>';
 
+  bootStep(3);
+  bootDone();
+  $("boot").style.display = "none";
+  $("skeleton").style.display = "none";
   $("status").style.display = "none";
   $("body").style.display = "block";
 }
