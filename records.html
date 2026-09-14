@@ -131,6 +131,9 @@ h2{font-size:14px;margin:0 0 11px}
 .cp-tip{font-size:11.5px;color:var(--ink2);line-height:1.6;margin-top:8px;
         background:#faf8f3;border-radius:8px;padding:9px 11px}
 .cp-tip.ok{background:#eff6ec;color:#3f6b31}
+
+.org{margin:30px auto 0;text-align:center;font-size:11px;color:var(--ink3);
+     line-height:2;letter-spacing:.02em}
 .gift.out{opacity:.5}
 .lv1{color:var(--green);font-weight:600}
 .lv0{color:var(--red);font-weight:600}
@@ -172,7 +175,7 @@ h2{font-size:14px;margin:0 0 11px}
 
     <div class="card">
       <h2>兌換獎勵</h2>
-      <div style="font-size:11.5px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">點數足夠時按下兌換，系統會產生專屬券碼並傳到你的 LINE，至指定地點出示即可領取。</div>
+      <div style="font-size:11.5px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">點數足夠時按下兌換，系統會產生專屬券碼並顯示於下方「兌換紀錄」，依序操作即可完成。</div>
       <div id="gifts"></div>
     </div>
 
@@ -191,6 +194,13 @@ h2{font-size:14px;margin:0 0 11px}
     </div>
 
   </div>
+
+  <div class="org">
+    <div>指導單位：環境部資源循環署　補助</div>
+    <div>主辦單位：嘉義市政府環境保護局　廣告</div>
+    <div>執行單位：志欣環保工程有限公司</div>
+  </div>
+
 </div>
 
 <script>
@@ -198,7 +208,7 @@ h2{font-size:14px;margin:0 0 11px}
 const LIFF_ID = "2011533465-IUMILFYy";
 const API     = "https://script.google.com/macros/s/AKfycbytQFDvJ9aBHqrz4TgAqz4pnNfwLv4dxUgjG9pBY1WFipiCKUF5jqiHtF91HX626ZhYHQ/exec";
 /* 改這支檔案時，要與 Code.gs 的 CFG.CLIENT_VERSION 改成同一個值 */
-const VERSION = "2026-09-13b";
+const VERSION = "2026-09-14a";
 /* ═════════════════════════ */
 
 /* 獎勵品項由後端提供，改設定不必改前端 */
