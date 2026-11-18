@@ -100,6 +100,15 @@ textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius
          background:#fff;color:var(--ink);font-size:14px;outline:none;resize:vertical;
          min-height:62px;font-family:inherit}
 input:focus,textarea:focus{border-color:var(--green)}
+.stamp-pre{display:flex;align-items:center;gap:13px;background:#fff;
+  border:1.5px solid var(--green);border-radius:14px;padding:15px 16px;
+  margin:14px 0 4px;text-align:left}
+.stamp-pre .ring{width:54px;height:54px;border-radius:50%;border:2px dashed #bcd0b2;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#f2f7ef;
+  font-size:13px;font-weight:800;color:var(--green);line-height:1.15;text-align:center}
+.stamp-pre .body{font-size:12.5px;line-height:1.7}
+.stamp-pre .body b{font-size:14px;color:var(--green)}
+.stamp-pre .why{color:#7d7365;font-size:11.5px}
 .storename{font-size:12.5px;margin-top:7px;font-weight:600}
 .storeok{color:var(--green)} .storeng{color:var(--red)}
 
@@ -176,11 +185,18 @@ input[type=file]{display:none}
     </div>
 
     <div class="card" id="card-sub" style="display:none">
-      <span class="lbl"><span class="step-no">2</span>減量作為類型</span>
-      <div class="guide">
-        請選擇你這次做的是哪一種。<b>捐出或交換物品</b>、<b>購買二手物</b>、<b>把壞掉的東西修好</b>都算。
-      </div>
+      <span class="lbl" id="lbl-sub"><span class="step-no">2</span>減量作為類型</span>
+      <div class="guide" id="g-sub"></div>
       <div class="subs" id="subs"></div>
+    </div>
+
+    <div class="card" id="card-lodging" style="display:none">
+      <span class="lbl" id="lbl-lodging"><span class="step-no">3</span>入住旅宿</span>
+      <div class="guide">
+        請填寫<b>你實際入住的旅宿名稱</b>，不限是否為合作旅宿。名稱需與下一步的住宿證明相符。
+      </div>
+      <input id="lodging" type="text" maxlength="60" placeholder="例如：嘉楠風華酒店" oninput="check()">
+      <div class="hint">本欄為期末統計各旅宿被回報次數之依據，請盡量填寫完整名稱。</div>
     </div>
 
     <div class="card" id="card-items" style="display:none">
@@ -251,6 +267,10 @@ input[type=file]{display:none}
     <h2 id="done-t"></h2>
     <p id="done-m"></p>
     <p class="sn" id="done-s"></p>
+    <div class="stamp-pre" id="done-stamp" style="display:none">
+      <div class="ring" id="done-ring"></div>
+      <div class="body" id="done-stamp-txt"></div>
+    </div>
     <button class="btn" onclick="location.reload()">再上傳一筆</button>
     <button class="btn sub2" onclick="go('records.html')">查看我的紀錄</button>
     <button class="btn sub2" id="close-btn" onclick="closeWin()">關閉</button>
@@ -269,7 +289,7 @@ input[type=file]{display:none}
 const LIFF_ID = "2011533465-IUMILFYy";
 const API     = "https://script.google.com/macros/s/AKfycbytQFDvJ9aBHqrz4TgAqz4pnNfwLv4dxUgjG9pBY1WFipiCKUF5jqiHtF91HX626ZhYHQ/exec";
 /* 改這支檔案時，要與 Code.gs 的 CFG.CLIENT_VERSION 改成同一個值 */
-const VERSION = "2026-09-14a";
+const VERSION = "2026-11-18a";
 /* ═══════════ */
 
 /* 各任務的畫面文字。改任務名稱時這裡也要一起改。 */
@@ -279,12 +299,16 @@ const TASK_UI = {
       g1:"請讓<b>自備的容器</b>與店家的<b>認證標章</b>同時入鏡。若回報多件，請一起拍進同一張照片。",
       p2:"當日消費證明（建議）",
       g2:"發票、收據或訂單畫面。附上可加快審核，也能避免被誤判為重複上傳。" },
-  B:{ em:"🧳", desc:"自備盥洗用品或環保杯入住本市旅宿",
+  B:{ em:"🧳", desc:"自備盥洗用品或水瓶入住本市旅宿",
+      sub:"這次自備了什麼？",
+      subGuide:"兩種都做了的話，<b>請分成兩次上傳</b>，點數與戳印各自計算。",
       p1:"自備小樣照片（必要）",
-      g1:"請拍下你<b>自己帶的盥洗用品或環保杯</b>，最好與旅宿房間或櫃台一起入鏡。",
-      p2:"住宿證明（建議）",
-      g2:"訂房確認畫面或住宿收據，用來確認入住日期與地點。" },
+      g1:"請拍下你<b>自己帶的盥洗用品或水瓶</b>，最好與旅宿房間或櫃台一起入鏡。",
+      p2:"住宿證明（必要）",
+      g2:"訂房確認畫面或住宿收據，需可看出<b>旅宿名稱與入住日期</b>。旅宿由你自行填寫，故此項為必要。" },
   C:{ em:"♻️", desc:"交換、購買二手或維修物品，延長物品壽命",
+      sub:"減量作為類型",
+      subGuide:"請選擇你這次做的是哪一種。<b>捐出或交換物品</b>、<b>購買二手物</b>、<b>把壞掉的東西修好</b>都算。",
       p1:"物品照片（必要）",
       g1:"請拍下<b>交換／購買／維修的物品</b>。維修類請盡量拍出修復後的樣子。",
       p2:"地點或單據照片（建議）",
@@ -466,13 +490,16 @@ function renderTasks(){
       ? (passedOnce ? "已完成，不可重複"
         : st ? "審核中，通過後可得 " + cfg.points + " 點"
              : "每人限一次・" + cfg.points + " 點")
-      : (cfg.weekly > 0
-          ? "本週 " + (wk.used || 0) + " / " + cfg.weekly + " 次"
-          : "不限次數");
+      : (cfg.monthly > 0
+          ? "本月 " + (wk.monthUsed || 0) + " / " + cfg.monthly + " 次"
+          : cfg.weekly > 0
+            ? "本週 " + (wk.used || 0) + " / " + cfg.weekly + " 次"
+            : "不限次數");
     const d = document.createElement("div");
     d.className = "task" + (full ? " done" : "");
     d.innerHTML = '<div class="em">'+(ui.em||"•")+'</div><div><div class="tt">'+
-      cfg.name+(passedOnce?"（已完成）":(doneOnce?"（審核中）":(full?"（本週已達上限）":"")))+'</div><div class="td">'+(ui.desc||"")+
+      cfg.name+(passedOnce?"（已完成）":(doneOnce?"（審核中）":
+        (full?(cfg.monthly>0?"（本月已達上限）":"（本週已達上限）"):"")))+'</div><div class="td">'+(ui.desc||"")+
       '</div><div class="lim">'+limTxt+'</div></div>';
     if(!full) d.onclick = ()=>selTask(k, d);
     box.appendChild(d);
@@ -485,9 +512,20 @@ function selTask(k, el){
   el.classList.add("on");
 
   const cfg = CONF.tasks[k], ui = TASK_UI[k] || {};
-  $("card-items").style.display = cfg.multi ? "block" : "none";
-  $("card-store").style.display = cfg.needStore ? "block" : "none";
-  $("card-sub").style.display   = (k === "C") ? "block" : "none";
+  $("card-items").style.display   = cfg.multi ? "block" : "none";
+  $("card-store").style.display   = cfg.needStore ? "block" : "none";
+  $("card-sub").style.display     = cfg.needSub ? "block" : "none";
+  $("card-lodging").style.display = cfg.needLodging ? "block" : "none";
+  if(!cfg.needLodging) $("lodging").value = "";
+
+  // 步驟編號依實際出現的卡片重算，不然跳號會讓人以為漏填
+  let step = 1;
+  const nos = {};
+  if(cfg.multi)       nos.items   = ++step;
+  if(cfg.needSub)     nos.sub     = ++step;
+  if(cfg.needStore)   nos.store   = ++step;
+  if(cfg.needLodging) nos.lodging = ++step;
+  nos.p1 = ++step; nos.p2 = ++step;
 
   // 電子發票加成：僅「自備探險嘉」適用
   const rate  = (CONF && CONF.bonusRate) || 1.5;
@@ -521,20 +559,29 @@ function selTask(k, el){
   }
 
   if(cfg.multi) renderItems();
-  if(k === "C") renderSubs();
+  if(cfg.needSub){
+    renderSubs(k);
+    $("lbl-sub").innerHTML = '<span class="step-no">'+nos.sub+'</span>'+(ui.sub||"類型");
+    $("g-sub").innerHTML   = ui.subGuide || "";
+  }
+  if(cfg.multi)     $("card-items").querySelector(".lbl .step-no").textContent = nos.items;
+  if(cfg.needStore) $("card-store").querySelector(".lbl .step-no").textContent = nos.store;
+  if(cfg.needLodging)
+    $("lbl-lodging").innerHTML = '<span class="step-no">'+nos.lodging+'</span>入住旅宿';
 
   // 依任務更換照片欄位的標題與說明
-  $("lbl-p1").innerHTML = '<span class="step-no">'+(cfg.needStore?4:3)+'</span>'+(ui.p1||"主要照片（必要）");
+  $("lbl-p1").innerHTML = '<span class="step-no">'+nos.p1+'</span>'+(ui.p1||"主要照片（必要）");
   $("g-p1").innerHTML   = ui.g1 || "";
-  $("lbl-p2").innerHTML = '<span class="step-no">'+(cfg.needStore?5:4)+'</span>'+(ui.p2||"佐證照片（建議）");
+  $("lbl-p2").innerHTML = '<span class="step-no">'+nos.p2+'</span>'+(ui.p2||"佐證照片（建議）");
   $("g-p2").innerHTML   = ui.g2 || "";
 
   check();
 }
 
-function renderSubs(){
+/** 只列出屬於這條任務線的子類型（代號首字＝任務線代號）*/
+function renderSubs(taskKey){
   const box = $("subs"); box.innerHTML = "";
-  Object.keys(CONF.subtypes).forEach(k=>{
+  Object.keys(CONF.subtypes).filter(k=>k.charAt(0) === taskKey).forEach(k=>{
     const b = document.createElement("div");
     b.className = "sub"; b.textContent = CONF.subtypes[k];
     b.onclick = ()=>{
@@ -681,7 +728,9 @@ function check(){
   if(!task || !ph1){ $("send").disabled = true; return; }
   const cfg = CONF.tasks[task];
   if(cfg.needStore && !storeOK){ $("send").disabled = true; return; }
-  if(task === "C" && !subtype){ $("send").disabled = true; return; }
+  if(cfg.needSub && !subtype){ $("send").disabled = true; return; }
+  if(cfg.needLodging && !$("lodging").value.trim()){ $("send").disabled = true; return; }
+  if(cfg.needProof && !ph2){ $("send").disabled = true; return; }
   if(cfg.multi){
     const tot = Object.keys(counts).reduce((a,x)=>a+counts[x],0);
     if(tot < 1){ $("send").disabled = true; return; }
@@ -700,9 +749,10 @@ async function send(){
   try{
     const d = await api({
       action:"submit", displayName:uname, task:task,
-      subtype: task === "C" ? subtype : "",
+      subtype: CONF.tasks[task].needSub ? subtype : "",
       items: CONF.tasks[task].multi ? counts : null,
       storeCode: CONF.tasks[task].needStore ? $("store").value.trim() : "",
+      lodging: CONF.tasks[task].needLodging ? $("lodging").value.trim() : "",
       photoContainer: ph1, photoProof: ph2,
       eInvoice: $("einv-check").checked,
       note: $("note").value.trim(),
@@ -717,6 +767,20 @@ async function send(){
       $("done-t").textContent = d.status === "通過" ? "任務完成！" : "上傳成功";
       $("done-m").textContent = d.msg || "";
       $("done-s").textContent = d.serial ? "編號 " + d.serial : "";
+
+      // 戳印預告。只在這次真的會發時顯示，避免給錯期待。
+      const sp = d.stamp;
+      if(sp && sp.ok){
+        const nm = String(sp.name || "");
+        $("done-ring").innerHTML =
+          nm.length > 3 ? nm.slice(0, Math.ceil(nm.length/2)) + "<br>" + nm.slice(Math.ceil(nm.length/2)) : nm;
+        $("done-stamp-txt").innerHTML =
+          "審核通過後將獲得<br><b>「" + nm + "」戳印</b><br>" +
+          '<span class="why">' + (sp.src || "") + "・屆時於「我的紀錄」顯示</span>";
+        $("done-stamp").style.display = "flex";
+      }else{
+        $("done-stamp").style.display = "none";
+      }
     }else{
       alert(d.error || "送出失敗，請再試一次");
       btn.disabled = false; btn.textContent = "送出"; sending = false;

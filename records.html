@@ -82,6 +82,70 @@ h2{font-size:14px;margin:0 0 11px}
 .wk div{flex:1;min-width:96px;text-align:center;padding:10px 6px;
         border:1px solid var(--line);border-radius:10px;font-size:12px}
 .wk .can{border-color:var(--green);color:var(--green);font-weight:700}
+
+/* 戳印簿 */
+.stamp-top{display:flex;align-items:baseline;gap:7px;margin:2px 0 0}
+.stamp-top .n{font-size:30px;font-weight:900;color:var(--green);line-height:1}
+.stamp-top .of{font-size:13px;color:var(--ink2)}
+.stamp-top .next{margin-left:auto;font-size:11.5px;color:var(--ink2)}
+.bar{height:6px;background:#e8e2d5;border-radius:99px;margin:9px 0 10px;overflow:hidden}
+.bar .fill{height:100%;background:var(--green);border-radius:99px;width:0;
+  transition:width .6s cubic-bezier(.3,1,.4,1)}
+.legend{display:flex;gap:14px;font-size:10.5px;color:var(--ink2);margin-bottom:12px}
+.legend .dot{display:inline-block;width:11px;height:11px;border-radius:50%;
+  border:2px solid var(--green);margin-right:4px;vertical-align:-1px}
+.legend .dot.other{border-color:var(--brown)}
+.stamp-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 8px}
+.st{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;
+  background:none;border:0;padding:0;font-family:inherit;color:inherit;
+  transition:transform .2s ease}
+.st:hover{transform:translateY(-2px)}
+.st .seal{width:100%;max-width:74px;aspect-ratio:1/1}
+.st .nm{font-size:11px;font-weight:700;line-height:1.3;text-align:center}
+.st .dt{font-size:10px;color:var(--ink2);line-height:1.3;text-align:center}
+.st.locked .nm{color:var(--ink2);font-weight:500}
+@keyframes sealin{0%{transform:scale(1.7) rotate(-12deg);opacity:0}
+  55%{transform:scale(.93) rotate(2deg);opacity:1}
+  78%{transform:scale(1.03) rotate(-1deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes dashspin{to{stroke-dashoffset:-116}}
+.seal.got{animation:sealin .8s cubic-bezier(.2,1.45,.35,1) both;transform-origin:50% 50%}
+.seal .ring-dash{animation:dashspin 16s linear infinite}
+@media (prefers-reduced-motion:reduce){
+  .seal.got{animation:none}.seal .ring-dash{animation:none}}
+.stamp-note{font-size:11px;color:var(--ink2);line-height:1.7;margin-top:12px}
+
+/* 里程碑 */
+.ms{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid #efeade}
+.ms:last-child{border-bottom:0}
+.ms .lv{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;
+  align-items:center;justify-content:center;font-size:13px;font-weight:800;
+  background:#e8e2d5;color:var(--ink2)}
+.ms.on .lv{background:var(--green);color:#fff}
+.ms .mid{flex:1;min-width:0}
+.ms .t{font-size:13px;font-weight:700}
+.ms .d{font-size:11px;color:var(--ink2)}
+.ms .act{border:0;border-radius:9px;padding:9px 15px;font-size:12.5px;font-weight:700;
+  font-family:inherit;white-space:nowrap;background:var(--green);color:#fff;cursor:pointer}
+.ms .act[disabled]{background:#e8e2d5;color:var(--ink2);cursor:default}
+.ms .wait{font-size:12px;color:var(--ink2);white-space:nowrap}
+
+/* 戳印詳情 */
+.sheet{display:none;position:fixed;inset:0;background:rgba(61,50,38,.45);z-index:60;
+  align-items:flex-end;justify-content:center}
+.sheet.show{display:flex}
+.sheet-in{background:var(--card);width:100%;max-width:480px;border-radius:18px 18px 0 0;
+  padding:10px 18px 22px;max-height:88vh;overflow:auto}
+.sheet-bar{width:38px;height:4px;border-radius:99px;background:#ddd6c8;margin:0 auto 14px}
+.sd-head{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.sd-ring{width:88px;height:88px;flex-shrink:0}
+.sd-name{font-size:18px;font-weight:900}
+.sd-sub{font-size:12px;color:var(--ink2);margin-top:2px}
+.sd-row{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #efeade;font-size:12.5px}
+.sd-row:last-child{border-bottom:0}
+.sd-row .k{width:68px;flex-shrink:0;color:var(--ink2)}
+.sd-row .v{font-weight:600;word-break:break-all}
+.sd-tip{background:#f2f7ef;border-radius:10px;padding:11px 13px;font-size:11.5px;
+  line-height:1.75;margin:12px 0}
 .wk .did{background:#f2f0ea;color:var(--ink3)}
 
 .rec{display:flex;justify-content:space-between;gap:10px;
@@ -167,6 +231,29 @@ h2{font-size:14px;margin:0 0 11px}
       <button class="pt-btn" onclick="go('index.html')"><span class="pl">＋</span>上傳任務</button>
     </div>
 
+    <div class="card" id="card-stamp" style="display:none">
+      <h2 class="fold" onclick="go('#')" style="cursor:default;pointer-events:none">
+        <span>我的戳印簿</span><span class="fold-i" id="stamp-year"></span>
+      </h2>
+      <div class="stamp-top">
+        <span class="n" id="stamp-n">0</span><span class="of" id="stamp-of">/ 0 枚</span>
+        <span class="next" id="stamp-next"></span>
+      </div>
+      <div class="bar"><div class="fill" id="stamp-bar"></div></div>
+      <div class="legend">
+        <span><i class="dot self"></i>自備行為類</span>
+        <span><i class="dot other"></i>惜物與活動類</span>
+      </div>
+      <div class="stamp-grid" id="stamp-grid"></div>
+      <div class="stamp-note">完成減量行為、經審核通過後自動蓋上，<b>不需到場打卡</b>。點選戳印可看取得來源。</div>
+    </div>
+
+    <div class="card" id="card-ms" style="display:none">
+      <h2>里程碑回饋</h2>
+      <div style="font-size:11.5px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">以<b>固定枚數</b>計，年度中新增戳印不影響已設門檻。各階固定總份數，額滿為止，每階限領一次。</div>
+      <div id="ms-list"></div>
+    </div>
+
     <div class="card">
       <h2>本週任務</h2>
       <div style="font-size:11.5px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">顯示本週已完成次數。額度每週一重新計算。</div>
@@ -195,6 +282,21 @@ h2{font-size:14px;margin:0 0 11px}
 
   </div>
 
+  <div class="sheet" id="sd" onclick="if(event.target===this)closeStamp()">
+    <div class="sheet-in">
+      <div class="sheet-bar"></div>
+      <div class="sd-head">
+        <div class="sd-ring" id="sd-ring"></div>
+        <div>
+          <div class="sd-name" id="sd-name"></div>
+          <div class="sd-sub" id="sd-sub"></div>
+        </div>
+      </div>
+      <div id="sd-body"></div>
+      <button class="btn sub2" onclick="closeStamp()">關閉</button>
+    </div>
+  </div>
+
   <div class="org">
     <div>指導單位：環境部資源循環署　補助</div>
     <div>主辦單位：嘉義市政府環境保護局　廣告</div>
@@ -208,7 +310,7 @@ h2{font-size:14px;margin:0 0 11px}
 const LIFF_ID = "2011533465-IUMILFYy";
 const API     = "https://script.google.com/macros/s/AKfycbytQFDvJ9aBHqrz4TgAqz4pnNfwLv4dxUgjG9pBY1WFipiCKUF5jqiHtF91HX626ZhYHQ/exec";
 /* 改這支檔案時，要與 Code.gs 的 CFG.CLIENT_VERSION 改成同一個值 */
-const VERSION = "2026-09-14a";
+const VERSION = "2026-11-18a";
 /* ═════════════════════════ */
 
 /* 獎勵品項由後端提供，改設定不必改前端 */
@@ -353,6 +455,8 @@ async function load(){
     return '<div class="'+(w.full?"did":"can")+'">'+esc(w.name)+'<br>'+txt+'</div>';
   }).join("");
 
+  renderStamps(d);
+
   GIFTS = d.gifts || [];
   $("gifts").innerHTML = GIFTS.map((g,i)=>{
     const out  = g.soldOut;
@@ -444,6 +548,174 @@ async function load(){
   $("status").style.display = "none";
   $("body").style.display = "block";
 }
+
+
+/* ══════════ 戳印簿 ══════════ */
+
+let STAMPS = [], MS = [], STAMP_YEAR = 0;
+
+/* 戳印分色。self＝自備行為類，其餘＝惜物與活動類。
+   目前沿用本頁既有的綠＋褐。若日後整個前台改成藍色系，
+   把 self 改成 '#2F6B99' 即可，其他地方不必動。 */
+const SEAL_COLOR = { self:'#5c8a4a', other:'#8b6f47', lock:'#a9a196' };
+
+/**
+ * 畫一枚印章。純 SVG，不載圖檔。
+ * 已取得＝實心雙圈＋篆印式字排；未取得＝虛線外圈＋淡字，
+ * 讓人看得到「將來長什麼樣」，又不會誤以為已經拿到。
+ */
+function sealSvg(st, size){
+  const col  = st.cat === 'self' ? SEAL_COLOR.self : SEAL_COLOR.other;
+  const name = String(st.name || '');
+  const half = Math.ceil(name.length / 2);
+  const l1 = name.length <= 2 ? name : name.slice(0, half);
+  const l2 = name.length <= 2 ? ''   : name.slice(half);
+  const fs = (l1.length >= 3 || l2.length >= 3) ? 40 : 50;
+  const y1 = l2 ? 72 : 100, y2 = 128;
+  const uid = 'sk' + st.code + (st.got ? 'g' : 'l');
+  const ink = st.got ? col : SEAL_COLOR.lock;
+  const op  = st.got ? '.93' : '.34';
+  const rot = ({S1:-5,S2:4,S3:3,S4:-6,S5:4,S6:5,S7:-7})[st.code] || 0;
+
+  const dash = st.got ? '' :
+    '<circle class="ring-dash" cx="100" cy="100" r="92" fill="none" stroke="#cfc6b4" ' +
+    'stroke-width="4" stroke-linecap="round" stroke-dasharray="9 20"/>';
+  const outer = st.got
+    ? '<circle cx="100" cy="100" r="92" fill="none" stroke="' + ink + '" stroke-width="8"/>' : '';
+
+  return '<svg class="seal ' + (st.got ? 'got' : 'lock') + '" viewBox="0 0 200 200" ' +
+    (size ? 'width="' + size + '" height="' + size + '" ' : '') +
+    'role="img" aria-label="' + esc(name) + '戳印，' + (st.got ? '已取得' : '尚未取得') + '">' +
+    '<defs><filter id="' + uid + '" x="-25%" y="-25%" width="150%" height="150%">' +
+    '<feTurbulence type="fractalNoise" baseFrequency="0.055" numOctaves="3" seed="' +
+    (st.code.charCodeAt(1) * 7) + '" result="n"/>' +
+    '<feDisplacementMap in="SourceGraphic" in2="n" scale="3.8" ' +
+    'xChannelSelector="R" yChannelSelector="G"/></filter></defs>' +
+    dash +
+    '<g transform="rotate(' + rot + ' 100 100)" filter="url(#' + uid + ')" ' +
+    'fill="' + ink + '" opacity="' + op + '">' + outer +
+    '<circle cx="100" cy="100" r="78" fill="none" stroke="' + ink + '" stroke-width="3"/>' +
+    '<text x="100" y="' + y1 + '" text-anchor="middle" dominant-baseline="central" ' +
+    'font-size="' + fs + '" font-weight="900" letter-spacing="' + (fs === 50 ? 6 : 3) + '">' +
+    esc(l1) + '</text>' +
+    (l2 ? '<text x="100" y="' + y2 + '" text-anchor="middle" dominant-baseline="central" ' +
+      'font-size="' + fs + '" font-weight="900" letter-spacing="' + (fs === 50 ? 6 : 3) + '">' +
+      esc(l2) + '</text>' : '') +
+    '</g></svg>';
+}
+
+function renderStamps(d){
+  if(!d.stampEnabled){ $("card-stamp").style.display = "none";
+                       $("card-ms").style.display = "none"; return; }
+  STAMPS = d.stamps || [];
+  MS = d.milestones || [];
+  STAMP_YEAR = d.stampYear || 0;
+  const got = d.stampCount || 0, all = STAMPS.length;
+
+  $("card-stamp").style.display = "block";
+  $("stamp-year").textContent = STAMP_YEAR ? (STAMP_YEAR + " 年度") : "";
+  $("stamp-n").textContent = got;
+  $("stamp-of").textContent = "/ " + all + " 枚";
+
+  // 進度條對準「下一個里程碑」，不是總枚數。
+  // 年度中新增戳印時總枚數會變，拿它當分母會讓進度倒退。
+  const nextMs = MS.filter(m => !m.claimed && got < m.need)[0];
+  if(nextMs){
+    $("stamp-next").textContent = "再 " + (nextMs.need - got) + " 枚可領「集滿 " + nextMs.need + " 枚」";
+    $("stamp-bar").style.width = Math.min(100, got / nextMs.need * 100) + "%";
+  }else{
+    $("stamp-next").textContent = MS.length ? "各階回饋皆已達成" : "";
+    $("stamp-bar").style.width = "100%";
+  }
+
+  $("stamp-grid").innerHTML = STAMPS.map((st, i) =>
+    '<button type="button" class="st' + (st.got ? '' : ' locked') + '" onclick="openStamp(' + i + ')">' +
+      sealSvg(st) +
+      '<div class="nm">' + esc(st.name) + '</div>' +
+      '<div class="dt">' + (st.got ? esc(st.date) + ' 取得'
+            : (st.allYear ? '全年開放' : st.months.join('、') + ' 月')) + '</div>' +
+    '</button>').join("");
+
+  // 進場時依序蓋上，看起來像一枚一枚蓋進簿子
+  [...document.querySelectorAll('#stamp-grid .seal.got')].forEach((el, i) => {
+    el.style.animationDelay = (i * 0.12) + 's';
+  });
+
+  renderMs(got);
+}
+
+function renderMs(got){
+  if(!MS.length){ $("card-ms").style.display = "none"; return; }
+  $("card-ms").style.display = "block";
+  $("ms-list").innerHTML = MS.map((m, i) => {
+    const left = m.left < 0 ? "不限量" : ("剩餘 " + m.left + " 份");
+    let act;
+    if(m.claimed)       act = '<span class="wait">已領取</span>';
+    else if(m.soldOut)  act = '<button class="act" disabled>已發完</button>';
+    else if(m.canClaim) act = '<button class="act" onclick="claimMs(' + i + ')">領取</button>';
+    else                act = '<span class="wait">再 ' + m.shortBy + ' 枚</span>';
+    return '<div class="ms' + (m.reached ? ' on' : '') + '">' +
+      '<div class="lv">' + m.need + '</div>' +
+      '<div class="mid"><div class="t">集滿 ' + m.need + ' 枚・' + esc(m.item) + '</div>' +
+      '<div class="d">' + left + '</div></div>' + act + '</div>';
+  }).join("");
+}
+
+async function claimMs(i){
+  const m = MS[i];
+  if(!m || !m.canClaim) return;
+  if(!confirm("確定領取「集滿 " + m.need + " 枚」的回饋？\n\n" + m.item +
+              "\n\n每階限領一次，領取後會產生專屬券碼。")) return;
+  const btns = document.querySelectorAll("#ms-list .act");
+  btns.forEach(b => b.disabled = true);
+  try{
+    const d = await api({ action:"claimMilestone", displayName:uname, need:m.need });
+    if(d.ok){
+      alert("領取成功！\n\n回饋：" + d.item + "\n兌換碼：" + d.code +
+            "\n\n請將兌換碼複製後傳到官方帳號聊天室，我們確認後會核發電子券。");
+      await load();
+    }else{
+      alert(d.error || "領取失敗");
+      btns.forEach(b => b.disabled = false);
+    }
+  }catch(e){
+    alert("網路連線失敗，請稍後再試");
+    btns.forEach(b => b.disabled = false);
+  }
+}
+
+/* ── 戳印詳情 ── */
+function openStamp(i){
+  const st = STAMPS[i];
+  if(!st) return;
+  $("sd-ring").innerHTML = sealSvg(st, 88);
+  $("sd-name").textContent = st.name;
+  $("sd-sub").textContent = st.got
+    ? (STAMP_YEAR + " 年度・已取得")
+    : (st.allYear ? "全年開放，隨時完成即可取得"
+                  : ("限 " + st.months.join("、") + " 月開放" + (st.openNow ? "，目前開放中" : "，目前未開放")));
+
+  if(st.got){
+    const row = (k, v) => v ? '<div class="sd-row"><div class="k">' + k +
+                              '</div><div class="v">' + esc(v) + '</div></div>' : '';
+    $("sd-body").innerHTML =
+      '<div class="sd-tip">戳印綁定<b>實際減量行為</b>，不是到場打卡。以下是這一枚的取得來源。</div>' +
+      row("取得日期", st.date) + row("任務線", st.fromTask) +
+      row("場域店家", st.store) + row("回報內容", st.items) +
+      row("判定依據", st.src) + row("紀錄編號", st.serial) +
+      '<div class="sd-tip">同一場域重複回報<b>仍可累積點數</b>，但戳印每年度僅取得一次。</div>';
+  }else{
+    $("sd-body").innerHTML =
+      '<div class="sd-tip">這一枚還沒蓋上。完成下列行為並經審核通過後會自動入簿，<b>不需另外領取</b>。</div>' +
+      '<div class="sd-row"><div class="k">取得方式</div><div class="v">' +
+        esc(st.hint || "完成對應場域或任務線的上傳，審核通過即得") + '</div></div>' +
+      '<div class="sd-row"><div class="k">開放期間</div><div class="v">' +
+        (st.allYear ? "全年開放" : st.months.join("、") + " 月") + '</div></div>' +
+      '<button class="btn" style="margin-top:14px" onclick="go(\'index.html\')">前往上傳</button>';
+  }
+  $("sd").classList.add("show");
+}
+function closeStamp(){ $("sd").classList.remove("show"); }
 
 function esc(s){
   return String(s==null?"":s).replace(/[&<>"]/g,
