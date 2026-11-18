@@ -13,7 +13,9 @@
 :root{
   color-scheme:light only;
   --cream:#f7f4ea; --card:#fff; --ink:#3d3226; --ink2:#7d7365; --ink3:#a9a196;
-  --green:#5c8a4a; --brown:#8b6f47; --red:#c0503f; --line:#e5ded0;
+  --blue:#73A5CA; --deep:#2F6B99; --tint:#EAF2F8; --amber:#FFC81E;
+  --brown:#8b6f47; --red:#c0503f; --line:#e5ded0;
+  --green:#2F6B99; --soft:#EAF2F8;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
@@ -23,14 +25,14 @@ body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
 #status{padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:14px;white-space:pre-wrap}
 #boot{padding:34px 18px 30px;text-align:center}
 .ring{width:34px;height:34px;margin:0 auto 14px;border-radius:50%;
-      border:3px solid #e5ded0;border-top-color:var(--green);
+      border:3px solid #e5ded0;border-top-color:var(--blue);
       animation:spin .85s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .boot-tx{font-size:14px;font-weight:700;color:var(--ink)}
 .boot-sub{font-size:12px;color:var(--ink2);margin-top:4px;min-height:18px}
 .boot-bar{width:170px;height:3px;margin:15px auto 0;background:#e5ded0;
           border-radius:99px;overflow:hidden}
-.boot-bar i{display:block;height:100%;width:8%;background:var(--green);
+.boot-bar i{display:block;height:100%;width:8%;background:var(--blue);
             border-radius:99px;transition:width .5s ease}
 .sk{background:var(--card);border:1px solid var(--line);border-radius:14px;
     padding:16px;margin-bottom:13px}
@@ -46,11 +48,8 @@ body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
 
 .pt-card{
   display:flex;align-items:center;gap:14px;
-  background:#5c8a4a;
-  background:-webkit-linear-gradient(315deg,#527d42,#7aa563);
-  background:linear-gradient(135deg,#527d42,#7aa563);
+  background:#73A5CA;
   border-radius:16px;padding:20px 18px;margin-bottom:14px;
-  box-shadow:0 3px 12px rgba(82,125,66,.25);
 }
 .pt-left{flex:1;min-width:0}
 .pt-card .n{font-size:44px;font-weight:800;line-height:1;color:#fff}
@@ -60,7 +59,7 @@ body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
   padding:4px 13px;border-radius:99px;font-size:11.5px;color:#fff;
 }
 .pt-btn{
-  background:#fff;border:none;color:#4a7a39;border-radius:14px;
+  background:#fff;border:none;color:var(--red);border-radius:14px;
   padding:14px 16px;font-size:13.5px;font-weight:800;line-height:1.4;
   cursor:pointer;white-space:nowrap;text-align:center;
   min-width:92px;box-shadow:0 2px 8px rgba(0,0,0,.14);
@@ -81,28 +80,62 @@ h2{font-size:14px;margin:0 0 11px}
 .wk{display:flex;gap:7px;flex-wrap:wrap}
 .wk div{flex:1;min-width:96px;text-align:center;padding:10px 6px;
         border:1px solid var(--line);border-radius:10px;font-size:12px}
-.wk .can{border-color:var(--green);color:var(--green);font-weight:700}
+.wk .can{border-color:var(--deep);color:var(--deep);font-weight:700}
+
+/* ── 戳印簿入口（我的紀錄頁）── */
+.book-in{display:block;cursor:pointer;color:var(--ink)}
+.bi-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.bi-head h2{margin:0}
+.bi-year{font-size:12px;color:var(--ink2)}
+.bi-dots{display:flex;gap:7px;justify-content:space-between;margin-bottom:12px}
+.bi-dots i{width:32px;height:32px;border-radius:50%;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;
+  border:1.5px dashed #cfc6b4;color:transparent}
+.bi-dots i.on{border:2px solid var(--deep);border-style:solid;color:var(--deep)}
+.bi-dots i.on.other{border-color:var(--brown);color:var(--brown)}
+.bi-next{background:var(--tint);border-radius:9px;padding:9px 11px;
+  font-size:11.5px;color:var(--deep);font-weight:700}
+
+/* ── 戳印簿整頁 ── */
+.bk-bar{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.bk-back{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);
+  background:var(--card);color:var(--ink);display:flex;align-items:center;
+  justify-content:center;cursor:pointer;flex-shrink:0;padding:0}
+.bk-t{font-size:15px;font-weight:700}
+.bk-s{font-size:11.5px;color:var(--ink2);margin-top:1px}
+.prog{border-radius:16px;padding:18px;background:#DCF0FF;margin-bottom:13px}
+.prog-top{display:flex;align-items:baseline;gap:7px}
+.prog-top .n{font-size:38px;font-weight:900;color:var(--ink);line-height:1}
+.prog-top .u{font-size:15px;color:var(--ink)}
+.prog-top .gap{margin-left:auto;font-size:11.5px;color:var(--ink)}
+.prog-bar{height:7px;background:rgba(61,50,38,.18);border-radius:99px;
+  margin:11px 0 0;overflow:hidden}
+.prog-bar .fill{height:100%;background:var(--blue);border-radius:99px;width:0;
+  transition:width .6s cubic-bezier(.3,1,.4,1)}
+.prog-foot{display:flex;justify-content:space-between;margin-top:7px;
+  font-size:10.5px;color:var(--ink)}
+.prog-note{margin-top:10px;padding-top:9px;border-top:1px solid rgba(61,50,38,.26);
+  font-size:10.5px;color:var(--ink);line-height:1.6}
 
 /* 戳印簿 */
-.stamp-top{display:flex;align-items:baseline;gap:7px;margin:2px 0 0}
-.stamp-top .n{font-size:30px;font-weight:900;color:var(--green);line-height:1}
+.stamp-top{display:flex;align-items:baseline;gap:7px;margin:8px 0 0}
+.stamp-top .n{font-size:30px;font-weight:900;color:var(--deep);line-height:1}
 .stamp-top .of{font-size:13px;color:var(--ink2)}
-.stamp-top .next{margin-left:auto;font-size:11.5px;color:var(--ink2)}
-.bar{height:6px;background:#e8e2d5;border-radius:99px;margin:9px 0 10px;overflow:hidden}
-.bar .fill{height:100%;background:var(--green);border-radius:99px;width:0;
+.bar{height:6px;background:#e8e2d5;border-radius:99px;margin:9px 0 12px;overflow:hidden}
+.bar .fill{height:100%;background:var(--blue);border-radius:99px;width:0;
   transition:width .6s cubic-bezier(.3,1,.4,1)}
-.legend{display:flex;gap:14px;font-size:10.5px;color:var(--ink2);margin-bottom:12px}
+.legend{display:flex;gap:14px;font-size:10.5px;color:var(--ink2);margin-bottom:14px}
 .legend .dot{display:inline-block;width:11px;height:11px;border-radius:50%;
-  border:2px solid var(--green);margin-right:4px;vertical-align:-1px}
+  border:2px solid var(--deep);margin-right:4px;vertical-align:-1px}
 .legend .dot.other{border-color:var(--brown)}
-.stamp-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 8px}
-.st{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;
+.stamp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 12px}
+.st{display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;
   background:none;border:0;padding:0;font-family:inherit;color:inherit;
   transition:transform .2s ease}
 .st:hover{transform:translateY(-2px)}
-.st .seal{width:100%;max-width:74px;aspect-ratio:1/1}
-.st .nm{font-size:11px;font-weight:700;line-height:1.3;text-align:center}
-.st .dt{font-size:10px;color:var(--ink2);line-height:1.3;text-align:center}
+.st .seal{width:96px;height:96px}
+.st .nm{font-size:13px;font-weight:700;line-height:1.3;text-align:center}
+.st .dt{font-size:11px;color:var(--ink2);line-height:1.3;text-align:center}
 .st.locked .nm{color:var(--ink2);font-weight:500}
 @keyframes sealin{0%{transform:scale(1.7) rotate(-12deg);opacity:0}
   55%{transform:scale(.93) rotate(2deg);opacity:1}
@@ -120,12 +153,12 @@ h2{font-size:14px;margin:0 0 11px}
 .ms .lv{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;
   align-items:center;justify-content:center;font-size:13px;font-weight:800;
   background:#e8e2d5;color:var(--ink2)}
-.ms.on .lv{background:var(--green);color:#fff}
+.ms.on .lv{background:var(--blue);color:#fff}
 .ms .mid{flex:1;min-width:0}
 .ms .t{font-size:13px;font-weight:700}
 .ms .d{font-size:11px;color:var(--ink2)}
 .ms .act{border:0;border-radius:9px;padding:9px 15px;font-size:12.5px;font-weight:700;
-  font-family:inherit;white-space:nowrap;background:var(--green);color:#fff;cursor:pointer}
+  font-family:inherit;white-space:nowrap;background:var(--blue);color:#fff;cursor:pointer}
 .ms .act[disabled]{background:#e8e2d5;color:var(--ink2);cursor:default}
 .ms .wait{font-size:12px;color:var(--ink2);white-space:nowrap}
 
@@ -136,15 +169,28 @@ h2{font-size:14px;margin:0 0 11px}
 .sheet-in{background:var(--card);width:100%;max-width:480px;border-radius:18px 18px 0 0;
   padding:10px 18px 22px;max-height:88vh;overflow:auto}
 .sheet-bar{width:38px;height:4px;border-radius:99px;background:#ddd6c8;margin:0 auto 14px}
-.sd-head{display:flex;align-items:center;gap:14px;margin-bottom:14px}
-.sd-ring{width:88px;height:88px;flex-shrink:0}
-.sd-name{font-size:18px;font-weight:900}
-.sd-sub{font-size:12px;color:var(--ink2);margin-top:2px}
+.sd-head{display:flex;justify-content:center;padding:6px 0 2px}
+.sd-ring{width:168px;height:168px;flex-shrink:0}
+.sd-ttl{text-align:center;margin-bottom:16px}
+.sd-name{font-size:19px;font-weight:900}
+.sd-sub{font-size:12.5px;color:var(--ink2);margin-top:2px}
+.sd-state{font-size:11.5px;color:var(--ink2);margin-top:4px}
+.sd-h{font-size:13.5px;margin:0 0 3px;font-weight:700}
+.sd-p{font-size:11px;color:var(--ink2);margin:0 0 12px}
+.sd-step{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid #efeade}
+.sd-no{width:22px;height:22px;border-radius:50%;background:var(--amber);color:var(--ink);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;
+  flex-shrink:0;margin-top:2px}
+.sd-tx{font-size:12.5px;line-height:1.7}
+.btn{width:100%;padding:14px;border:none;border-radius:12px;background:var(--blue);
+  color:#fff;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer}
+.btn.sub2{background:transparent;color:var(--ink2);border:1px solid var(--line);
+  font-size:13.5px;padding:11px;margin-top:10px}
 .sd-row{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #efeade;font-size:12.5px}
 .sd-row:last-child{border-bottom:0}
 .sd-row .k{width:68px;flex-shrink:0;color:var(--ink2)}
 .sd-row .v{font-weight:600;word-break:break-all}
-.sd-tip{background:#f2f7ef;border-radius:10px;padding:11px 13px;font-size:11.5px;
+.sd-tip{background:var(--tint);border-radius:10px;padding:11px 13px;font-size:11.5px;
   line-height:1.75;margin:12px 0}
 .wk .did{background:#f2f0ea;color:var(--ink3)}
 
@@ -153,7 +199,7 @@ h2{font-size:14px;margin:0 0 11px}
 .rec:last-child{border-bottom:none}
 .rec .t{font-size:11.5px;color:var(--ink3)}
 .st{font-size:11.5px;font-weight:700;white-space:nowrap;padding-top:2px}
-.s-pass{color:var(--green)} .s-wait{color:#b58a2b} .s-rej{color:var(--red)}
+.s-pass{color:var(--deep)} .s-wait{color:#b58a2b} .s-rej{color:var(--red)}
 .rsn{font-size:11px;color:var(--red);margin-top:2px}
 
 .gift{display:flex;justify-content:space-between;align-items:center;gap:10px;
@@ -177,7 +223,7 @@ h2{font-size:14px;margin:0 0 11px}
 .cpst{font-size:11.5px;font-weight:700;white-space:nowrap;padding:4px 11px;border-radius:99px}
 .cpst.cp-new{background:#fdf3e0;color:#8a6516}
 .cpst.cp-ret{background:#e6eff7;color:#2f5f8f}
-.cpst.cp-done{background:#eaf3e5;color:#3f6b31}
+.cpst.cp-done{background:var(--tint);color:var(--deep)}
 .cpst.cp-void{background:#f2efe8;color:#8a8378}
 .cp.cp-void{opacity:.7}
 .steps{display:flex;gap:6px;margin:9px 0 8px;flex-wrap:wrap}
@@ -194,7 +240,7 @@ h2{font-size:14px;margin:0 0 11px}
 .bret{background:#fff;color:var(--green);border:1.5px solid var(--green);width:100%}
 .cp-tip{font-size:11.5px;color:var(--ink2);line-height:1.6;margin-top:8px;
         background:#faf8f3;border-radius:8px;padding:9px 11px}
-.cp-tip.ok{background:#eff6ec;color:#3f6b31}
+.cp-tip.ok{background:var(--tint);color:var(--deep)}
 
 .org{margin:30px auto 0;text-align:center;font-size:11px;color:var(--ink3);
      line-height:2;letter-spacing:.02em}
@@ -231,28 +277,18 @@ h2{font-size:14px;margin:0 0 11px}
       <button class="pt-btn" onclick="go('index.html')"><span class="pl">＋</span>上傳任務</button>
     </div>
 
-    <div class="card" id="card-stamp" style="display:none">
-      <h2 class="fold" onclick="go('#')" style="cursor:default;pointer-events:none">
-        <span>我的戳印簿</span><span class="fold-i" id="stamp-year"></span>
-      </h2>
+    <!-- 戳印簿入口：畫布的「我的紀錄」只放這張摘要卡，點進去才是整本戳印簿 -->
+    <a class="card book-in" id="card-stamp" style="display:none" onclick="openBook()">
+      <div class="bi-head">
+        <h2>我的戳印簿</h2><span class="bi-year" id="stamp-year"></span>
+      </div>
       <div class="stamp-top">
         <span class="n" id="stamp-n">0</span><span class="of" id="stamp-of">/ 0 枚</span>
-        <span class="next" id="stamp-next"></span>
       </div>
       <div class="bar"><div class="fill" id="stamp-bar"></div></div>
-      <div class="legend">
-        <span><i class="dot self"></i>自備行為類</span>
-        <span><i class="dot other"></i>惜物與活動類</span>
-      </div>
-      <div class="stamp-grid" id="stamp-grid"></div>
-      <div class="stamp-note">完成減量行為、經審核通過後自動蓋上，<b>不需到場打卡</b>。點選戳印可看取得來源。</div>
-    </div>
-
-    <div class="card" id="card-ms" style="display:none">
-      <h2>里程碑回饋</h2>
-      <div style="font-size:11.5px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">以<b>固定枚數</b>計，年度中新增戳印不影響已設門檻。各階固定總份數，額滿為止，每階限領一次。</div>
-      <div id="ms-list"></div>
-    </div>
+      <div class="bi-dots" id="bi-dots"></div>
+      <div class="bi-next" id="stamp-next"></div>
+    </a>
 
     <div class="card">
       <h2>本週任務</h2>
@@ -282,15 +318,61 @@ h2{font-size:14px;margin:0 0 11px}
 
   </div>
 
+  <!-- 戳印簿整頁。畫布是獨立一張圖面，這裡以切換視圖呈現，不另開檔案 -->
+  <div id="book" style="display:none">
+    <div class="bk-bar">
+      <button type="button" class="bk-back" onclick="closeBook()" aria-label="返回我的紀錄">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"></path></svg>
+      </button>
+      <div>
+        <div class="bk-t">我的戳印簿</div>
+        <div class="bk-s"><span id="bk-year"></span>　嘉eat永續新生活</div>
+      </div>
+    </div>
+
+    <div class="prog">
+      <div class="prog-top">
+        <span class="n" id="bk-n">0</span><span class="u">枚</span>
+        <span class="gap" id="bk-gap"></span>
+      </div>
+      <div class="prog-bar"><div class="fill" id="bk-bar"></div></div>
+      <div class="prog-foot"><span id="bk-from"></span><span id="bk-to"></span></div>
+      <div class="prog-note">本年度目前開放 <b id="bk-all">0</b> 枚，活動期間將陸續新增限定戳印</div>
+    </div>
+
+    <div class="card">
+      <h2>年度戳印</h2>
+      <div style="font-size:11.5px;color:var(--ink2);margin:-4px 0 12px;line-height:1.6">完成減量行為、經審核通過後自動蓋上，<b style="color:var(--ink)">不需到場打卡</b>。點選戳印可看取得來源。</div>
+      <div class="legend">
+        <span><i class="dot self"></i>自備行為類</span>
+        <span><i class="dot other"></i>惜物與活動類</span>
+      </div>
+      <div class="stamp-grid" id="stamp-grid"></div>
+    </div>
+
+    <div class="card" id="card-ms" style="display:none">
+      <h2>里程碑回饋</h2>
+      <div style="font-size:11.5px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">以<b style="color:var(--ink)">固定枚數</b>計，年度中新增戳印不影響已設門檻。各階固定總份數，額滿為止，每階限領一次。</div>
+      <div id="ms-list"></div>
+    </div>
+
+    <div class="org">
+      <div>指導單位：環境部資源循環署　補助</div>
+      <div>主辦單位：嘉義市政府環境保護局　廣告</div>
+      <div>執行單位：志欣環保工程有限公司</div>
+    </div>
+  </div>
+
   <div class="sheet" id="sd" onclick="if(event.target===this)closeStamp()">
     <div class="sheet-in">
       <div class="sheet-bar"></div>
       <div class="sd-head">
         <div class="sd-ring" id="sd-ring"></div>
-        <div>
-          <div class="sd-name" id="sd-name"></div>
-          <div class="sd-sub" id="sd-sub"></div>
-        </div>
+      </div>
+      <div class="sd-ttl">
+        <div class="sd-name" id="sd-name"></div>
+        <div class="sd-sub" id="sd-sub"></div>
+        <div class="sd-state" id="sd-state"></div>
       </div>
       <div id="sd-body"></div>
       <button class="btn sub2" onclick="closeStamp()">關閉</button>
@@ -557,12 +639,13 @@ let STAMPS = [], MS = [], STAMP_YEAR = 0;
 /* 戳印分色。self＝自備行為類，其餘＝惜物與活動類。
    目前沿用本頁既有的綠＋褐。若日後整個前台改成藍色系，
    把 self 改成 '#2F6B99' 即可，其他地方不必動。 */
-const SEAL_COLOR = { self:'#5c8a4a', other:'#8b6f47', lock:'#a9a196' };
+const SEAL_COLOR = { self:'#2F6B99', other:'#8b6f47', lock:'#8f8574' };
 
 /**
  * 畫一枚印章。純 SVG，不載圖檔。
- * 已取得＝實心雙圈＋篆印式字排；未取得＝虛線外圈＋淡字，
- * 讓人看得到「將來長什麼樣」，又不會誤以為已經拿到。
+ * 已取得＝實心雙圈＋上下弧文字＋篆印式字排；
+ * 未取得＝只留內圈與淡字，外加一圈虛線，讓人看得到「將來長什麼樣」。
+ * 上弧固定為活動名稱，下弧為取得日期或「尚未取得」，與畫布一致。
  */
 function sealSvg(st, size){
   const col  = st.cat === 'self' ? SEAL_COLOR.self : SEAL_COLOR.other;
@@ -570,37 +653,45 @@ function sealSvg(st, size){
   const half = Math.ceil(name.length / 2);
   const l1 = name.length <= 2 ? name : name.slice(0, half);
   const l2 = name.length <= 2 ? ''   : name.slice(half);
-  const fs = (l1.length >= 3 || l2.length >= 3) ? 40 : 50;
-  const y1 = l2 ? 72 : 100, y2 = 128;
+  const big = !(l1.length >= 3 || l2.length >= 3);
+  const fs = big ? 43 : 35;
+  const ls = big ? 7 : 5;
+  const y1 = l2 ? (big ? 77 : 79) : 100;
+  const y2 = big ? 124 : 124;
   const uid = 'sk' + st.code + (st.got ? 'g' : 'l');
   const ink = st.got ? col : SEAL_COLOR.lock;
-  const op  = st.got ? '.93' : '.34';
-  const rot = ({S1:-5,S2:4,S3:3,S4:-6,S5:4,S6:5,S7:-7})[st.code] || 0;
+  const op  = st.got ? '.93' : '.38';
+  const rot = ({S1:-5,S2:4,S3:3,S4:-6,S5:-4,S6:5,S7:-7})[st.code] || 0;
+  const arc = st.got ? rocDate(st.date) : '尚未取得';
 
   const dash = st.got ? '' :
     '<circle class="ring-dash" cx="100" cy="100" r="92" fill="none" stroke="#cfc6b4" ' +
-    'stroke-width="4" stroke-linecap="round" stroke-dasharray="9 20"/>';
+    'stroke-width="3" stroke-linecap="round" stroke-dasharray="9 20"/>';
   const outer = st.got
-    ? '<circle cx="100" cy="100" r="92" fill="none" stroke="' + ink + '" stroke-width="8"/>' : '';
+    ? '<circle cx="100" cy="100" r="92" fill="none" stroke="' + ink + '" stroke-width="7"/>' : '';
 
   return '<svg class="seal ' + (st.got ? 'got' : 'lock') + '" viewBox="0 0 200 200" ' +
     (size ? 'width="' + size + '" height="' + size + '" ' : '') +
     'role="img" aria-label="' + esc(name) + '戳印，' + (st.got ? '已取得' : '尚未取得') + '">' +
     '<defs><filter id="' + uid + '" x="-25%" y="-25%" width="150%" height="150%">' +
-    '<feTurbulence type="fractalNoise" baseFrequency="0.055" numOctaves="3" seed="' +
+    '<feTurbulence type="fractalNoise" baseFrequency="0.052" numOctaves="3" seed="' +
     (st.code.charCodeAt(1) * 7) + '" result="n"/>' +
-    '<feDisplacementMap in="SourceGraphic" in2="n" scale="3.8" ' +
-    'xChannelSelector="R" yChannelSelector="G"/></filter></defs>' +
+    '<feDisplacementMap in="SourceGraphic" in2="n" scale="3.6" ' +
+    'xChannelSelector="R" yChannelSelector="G"/></filter>' +
+    '<path id="at' + uid + '" d="M 38 100 A 62 62 0 0 1 162 100"/>' +
+    '<path id="ab' + uid + '" d="M 37 100 A 63 63 0 0 0 163 100"/></defs>' +
     dash +
     '<g transform="rotate(' + rot + ' 100 100)" filter="url(#' + uid + ')" ' +
     'fill="' + ink + '" opacity="' + op + '">' + outer +
-    '<circle cx="100" cy="100" r="78" fill="none" stroke="' + ink + '" stroke-width="3"/>' +
+    '<circle cx="100" cy="100" r="79" fill="none" stroke="' + ink + '" stroke-width="2.5"/>' +
+    '<text font-size="11" letter-spacing="3.4" font-weight="700">' +
+      '<textPath href="#at' + uid + '" startOffset="50%" text-anchor="middle">嘉eat永續新生活</textPath></text>' +
     '<text x="100" y="' + y1 + '" text-anchor="middle" dominant-baseline="central" ' +
-    'font-size="' + fs + '" font-weight="900" letter-spacing="' + (fs === 50 ? 6 : 3) + '">' +
-    esc(l1) + '</text>' +
+    'font-size="' + fs + '" font-weight="900" letter-spacing="' + ls + '">' + esc(l1) + '</text>' +
     (l2 ? '<text x="100" y="' + y2 + '" text-anchor="middle" dominant-baseline="central" ' +
-      'font-size="' + fs + '" font-weight="900" letter-spacing="' + (fs === 50 ? 6 : 3) + '">' +
-      esc(l2) + '</text>' : '') +
+      'font-size="' + fs + '" font-weight="900" letter-spacing="' + ls + '">' + esc(l2) + '</text>' : '') +
+    '<text font-size="11.5" letter-spacing="3" font-weight="700">' +
+      '<textPath href="#ab' + uid + '" startOffset="50%" text-anchor="middle">' + esc(arc) + '</textPath></text>' +
     '</g></svg>';
 }
 
@@ -612,28 +703,40 @@ function renderStamps(d){
   STAMP_YEAR = d.stampYear || 0;
   const got = d.stampCount || 0, all = STAMPS.length;
 
-  $("card-stamp").style.display = "block";
-  $("stamp-year").textContent = STAMP_YEAR ? (STAMP_YEAR + " 年度") : "";
-  $("stamp-n").textContent = got;
-  $("stamp-of").textContent = "/ " + all + " 枚";
-
-  // 進度條對準「下一個里程碑」，不是總枚數。
+  // 進度以「下一個里程碑」為分母，不是總枚數。
   // 年度中新增戳印時總枚數會變，拿它當分母會讓進度倒退。
   const nextMs = MS.filter(m => !m.claimed && got < m.need)[0];
-  if(nextMs){
-    $("stamp-next").textContent = "再 " + (nextMs.need - got) + " 枚可領「集滿 " + nextMs.need + " 枚」";
-    $("stamp-bar").style.width = Math.min(100, got / nextMs.need * 100) + "%";
-  }else{
-    $("stamp-next").textContent = MS.length ? "各階回饋皆已達成" : "";
-    $("stamp-bar").style.width = "100%";
-  }
+  const prevMs = MS.filter(m => got >= m.need).slice(-1)[0];
+  const pct = nextMs ? Math.min(100, got / nextMs.need * 100) : 100;
+
+  /* ── 我的紀錄頁的入口摘要卡 ── */
+  $("card-stamp").style.display = "block";
+  $("stamp-year").textContent = (STAMP_YEAR ? (STAMP_YEAR + " 年度") : "") + " ›";
+  $("stamp-n").textContent = got;
+  $("stamp-of").textContent = "/ " + all + " 枚";
+  $("stamp-bar").style.width = pct + "%";
+  $("bi-dots").innerHTML = STAMPS.map(st =>
+    '<i class="' + (st.got ? ('on' + (st.cat === 'self' ? '' : ' other')) : '') + '">' +
+    (st.got ? dotIcon(st) : '') + '</i>').join("");
+  $("stamp-next").textContent = nextMs
+    ? ("再 " + (nextMs.need - got) + " 枚可領「集滿 " + nextMs.need + " 枚」里程碑回饋")
+    : (MS.length ? "各階回饋皆已達成" : "");
+
+  /* ── 戳印簿整頁的進度卡 ── */
+  $("bk-n").textContent = got;
+  $("bk-gap").textContent = nextMs ? ("距下一階還差 " + (nextMs.need - got) + " 枚") : "各階皆已達成";
+  $("bk-bar").style.width = pct + "%";
+  $("bk-from").textContent = prevMs ? ("已達・集滿 " + prevMs.need + " 枚") : "尚未達成任何一階";
+  $("bk-to").textContent = nextMs ? ("下一階・集滿 " + nextMs.need + " 枚") : "";
+  $("bk-all").textContent = all;
+  $("bk-year").textContent = STAMP_YEAR ? (STAMP_YEAR + " 年度") : "";
 
   $("stamp-grid").innerHTML = STAMPS.map((st, i) =>
     '<button type="button" class="st' + (st.got ? '' : ' locked') + '" onclick="openStamp(' + i + ')">' +
       sealSvg(st) +
       '<div class="nm">' + esc(st.name) + '</div>' +
-      '<div class="dt">' + (st.got ? esc(st.date) + ' 取得'
-            : (st.allYear ? '全年開放' : st.months.join('、') + ' 月')) + '</div>' +
+      '<div class="dt">' + (st.got ? esc(rocDate(st.date)) + ' 取得'
+            : esc(st.tip || (st.allYear ? '全年開放' : st.months.join('、') + ' 月'))) + '</div>' +
     '</button>').join("");
 
   // 進場時依序蓋上，看起來像一枚一枚蓋進簿子
@@ -642,6 +745,47 @@ function renderStamps(d){
   });
 
   renderMs(got);
+}
+
+/* 戳印簿是獨立一頁，與「我的紀錄」互相切換，回去時捲回原位 */
+let bookScroll = 0;
+function openBook(){
+  bookScroll = window.scrollY;
+  $("body").style.display = "none";
+  $("book").style.display = "block";
+  window.scrollTo(0, 0);
+}
+function closeBook(){
+  $("book").style.display = "none";
+  $("body").style.display = "block";
+  window.scrollTo(0, bookScroll);
+}
+
+/* 入口卡小圈裡的線條圖示。代號對不到時留空，不必為新增戳印改程式。 */
+const DOT_ICON = {
+  bag:   '<path d="M5 8h14l-1 12H6Z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path>',
+  cup:   '<path d="M6 7h12l-1.2 12.5a2 2 0 0 1-2 1.5H9.2a2 2 0 0 1-2-1.5Z"></path><path d="M5 4h14"></path>',
+  tool:  '<path d="M15 4 9 10"></path><path d="M4 18l6-6 4 4-6 6-4-4Z"></path>',
+  wash:  '<path d="M8 9h4v11H8z"></path><path d="M9 6h2v3H9z"></path><path d="M14 11h4v9h-4z"></path><path d="M15 8h2v3h-2z"></path>',
+  bottle:'<path d="M10 3h4v3h-4z"></path><path d="M9 6h6v13a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"></path><path d="M9 12h6"></path>',
+  flame: '<path d="M12 3c3 3.5 5 6.2 5 9a5 5 0 0 1-10 0c0-2.8 2-5.5 5-9Z"></path>',
+  flag:  '<path d="M6 21V4"></path><path d="M6 5h11l-2 3.5L17 12H6"></path>'
+};
+function dotIcon(st){
+  const d = DOT_ICON[st.icon];
+  if(!d) return esc(String(st.name || '').charAt(0));   // 沒設圖示就退回首字
+  const col = st.cat === 'self' ? SEAL_COLOR.self : SEAL_COLOR.other;
+  return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="' + col +
+         '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+         d + '</svg>';
+}
+
+/* 西元日期轉民國，畫布的戳印與列表都用民國。存檔仍存西元，只在顯示時換算。 */
+function rocDate(v, sep){
+  const m = String(v || '').match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/);
+  if(!m) return String(v || '');
+  const p = n => String(n).padStart(2, '0');
+  return (Number(m[1]) - 1911) + (sep || '.') + p(m[2]) + (sep || '.') + p(m[3]);
 }
 
 function renderMs(got){
@@ -688,9 +832,12 @@ async function claimMs(i){
 function openStamp(i){
   const st = STAMPS[i];
   if(!st) return;
-  $("sd-ring").innerHTML = sealSvg(st, 88);
+  // 畫布的詳情頁印章是 168px，佔滿整張卡，不是縮圖
+  $("sd-ring").innerHTML = sealSvg(st, 168);
   $("sd-name").textContent = st.name;
-  $("sd-sub").textContent = st.got
+  // 畫布在名稱下標出這枚屬於哪一個子活動，審查委員問起時答得出來
+  $("sd-sub").textContent = st.act ? ("子活動：" + st.act) : "";
+  $("sd-state").textContent = st.got
     ? (STAMP_YEAR + " 年度・已取得")
     : (st.allYear ? "全年開放，隨時完成即可取得"
                   : ("限 " + st.months.join("、") + " 月開放" + (st.openNow ? "，目前開放中" : "，目前未開放")));
@@ -699,16 +846,21 @@ function openStamp(i){
     const row = (k, v) => v ? '<div class="sd-row"><div class="k">' + k +
                               '</div><div class="v">' + esc(v) + '</div></div>' : '';
     $("sd-body").innerHTML =
-      '<div class="sd-tip">戳印綁定<b>實際減量行為</b>，不是到場打卡。以下是這一枚的取得來源。</div>' +
-      row("取得日期", st.date) + row("任務線", st.fromTask) +
+      '<h3 class="sd-h">這枚戳印的取得來源</h3>' +
+      '<p class="sd-p">戳印綁定實際減量行為，非到場打卡。</p>' +
+      row("行為時間", rocDate(st.date, "/")) + row("任務線", st.fromTask) +
       row("場域店家", st.store) + row("回報內容", st.items) +
       row("判定依據", st.src) + row("紀錄編號", st.serial) +
       '<div class="sd-tip">同一場域重複回報<b>仍可累積點數</b>，但戳印每年度僅取得一次。</div>';
   }else{
+    // 畫布用編號步驟說明怎麼拿到，比一行「取得方式」清楚
+    const steps = (st.how && st.how.length) ? st.how
+      : ["完成對應場域或任務線的上傳", "附上可辨識的照片與證明", "審核通過後自動蓋上，不需另外領取"];
     $("sd-body").innerHTML =
-      '<div class="sd-tip">這一枚還沒蓋上。完成下列行為並經審核通過後會自動入簿，<b>不需另外領取</b>。</div>' +
-      '<div class="sd-row"><div class="k">取得方式</div><div class="v">' +
-        esc(st.hint || "完成對應場域或任務線的上傳，審核通過即得") + '</div></div>' +
+      '<h3 class="sd-h">怎麼取得這枚戳印</h3>' +
+      steps.map((t, n) => '<div class="sd-step">' +
+        '<div class="sd-no">' + (n + 1) + '</div>' +
+        '<div class="sd-tx">' + esc(t) + '</div></div>').join("") +
       '<div class="sd-row"><div class="k">開放期間</div><div class="v">' +
         (st.allYear ? "全年開放" : st.months.join("、") + " 月") + '</div></div>' +
       '<button class="btn" style="margin-top:14px" onclick="go(\'index.html\')">前往上傳</button>';
