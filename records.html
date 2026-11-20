@@ -257,7 +257,8 @@ h2{font-size:14px;margin:0 0 11px}
 .cpst.cp-void{background:#f2efe8;color:#8a8378}
 .cp.cp-void{opacity:.7}
 .steps{display:flex;gap:6px;margin:9px 0 8px;flex-wrap:wrap}
-.steps span{font-size:12.5px;padding:3px 9px;border-radius:99px;background:#f2efe8;color:#b0a99e}
+/* 未達成的步驟原本 #b0a99e，在 #f2efe8 上只有 2.03:1，幾乎看不見。 */
+.steps span{font-size:12.5px;padding:3px 9px;border-radius:99px;background:#f2efe8;color:var(--ink3)}
 .steps span.on{background:var(--green);color:#fff;font-weight:700}
 .step-go{border:none;background:#06c755;color:#fff;font-size:13px;font-weight:700;
          padding:5px 12px;border-radius:99px;cursor:pointer;line-height:1.5}
@@ -266,8 +267,10 @@ h2{font-size:14px;margin:0 0 11px}
 .cp-act button{flex:1;padding:11px;border-radius:10px;font-size:15px;font-weight:700;
                border:none;cursor:pointer}
 .bcopy{background:var(--brown);color:#fff}
-.bline{background:#06c755;color:#fff}
-.bret{background:#fff;color:var(--green);border:1.5px solid var(--green);width:100%}
+/* LINE 綠配白字只有 2.26:1。綠色留著（民眾認得），字改深綠，5.48:1。 */
+.bline{background:#06c755;color:#0b3d1c}
+/* 要寫成 .cp-act .bret，否則外框會被上面的 .cp-act button{border:none} 蓋掉。 */
+.cp-act .bret{background:#fff;color:var(--green);border:1.5px solid var(--green);width:100%}
 .cp-tip{font-size:13px;color:var(--ink2);line-height:1.6;margin-top:8px;
         background:#faf8f3;border-radius:8px;padding:9px 11px}
 .cp-tip.ok{background:var(--tint);color:var(--deep)}
@@ -277,6 +280,35 @@ h2{font-size:14px;margin:0 0 11px}
 .gift.out{opacity:.5}
 .lv1{color:var(--green);font-weight:600}
 .lv0{color:var(--red);font-weight:600}
+
+/* 浮動「回到最上面」。捲過 200px 才出現，免得一開始就擋住內容。
+   可拖曳，放開吸附到左邊或右邊，左撇子可以停到左手邊。
+   touch-action:none 是必要的，否則拖曳會被瀏覽器當成捲動。
+   z-index 要低於說明面板，不然面板打開時圓點會浮在上面。 */
+#totop{position:fixed;right:16px;bottom:20px;width:56px;height:56px;border-radius:50%;
+  background:var(--blue);border:none;padding:0;display:none;align-items:center;
+  justify-content:center;box-shadow:0 3px 10px rgba(61,50,38,.3);cursor:pointer;
+  touch-action:none;z-index:50}
+#totop.on{display:flex}
+#totop:active{opacity:.85}
+
+/* 退件提示（畫布⑨）。核定後 CFG.REJECT_NOTICE_HOURS 小時內顯示，補傳即消失。 */
+.rj{background:var(--card);border:1px solid #e8c4bb;border-left:4px solid var(--red);
+  border-radius:12px;padding:14px 16px;margin-bottom:13px}
+.rj-h{display:flex;align-items:flex-start;gap:10px}
+.rj-t{font-size:16px;font-weight:700;color:var(--red)}
+.rj-s{font-size:13px;color:var(--ink3);margin-top:2px;line-height:1.65}
+.rj-s b{color:var(--ink)}
+.rj-r{background:#fdf3f1;border-radius:9px;padding:10px 12px;margin-top:10px;
+  font-size:14px;line-height:1.7}
+.rj-r b{color:var(--ink)}
+.rj-n{font-size:13px;color:var(--ink3);margin-top:9px;line-height:1.65}
+.rj-n b{color:var(--ink)}
+.rj-b{display:block;width:100%;text-align:center;background:var(--red);color:#fff;
+  border:none;border-radius:10px;padding:13px;font-size:16px;font-weight:700;
+  font-family:inherit;margin-top:12px;min-height:44px;cursor:pointer}
+.rj-m{font-size:13px;color:var(--ink3);margin-top:10px;padding-top:10px;
+  border-top:1px solid #f0e4e1;text-align:center}
 </style>
 </head>
 <body>
@@ -297,6 +329,10 @@ h2{font-size:14px;margin:0 0 11px}
       <div class="sk-row tall"></div></div>
   </div>
   <div id="body" style="display:none">
+
+    <!-- 有未補傳的退件才顯示，內容由後端的 rejectNotice 決定（畫布⑨）。
+         放在點數卡之前，因為這是整頁最需要先被看到的一件事。 -->
+    <div class="rj" id="rj" style="display:none"></div>
 
     <div class="pt-card">
       <div class="pt-left">
@@ -464,7 +500,7 @@ h2{font-size:14px;margin:0 0 11px}
 const LIFF_ID = "2011533465-IUMILFYy";
 const API     = "https://script.google.com/macros/s/AKfycbytQFDvJ9aBHqrz4TgAqz4pnNfwLv4dxUgjG9pBY1WFipiCKUF5jqiHtF91HX626ZhYHQ/exec";
 /* 改這支檔案時，要與 Code.gs 的 CFG.CLIENT_VERSION 改成同一個值 */
-const VERSION = "2026-11-20e";
+const VERSION = "2026-11-20f";
 /* ═════════════════════════ */
 
 /* 獎勵品項由後端提供，改設定不必改前端 */
@@ -681,6 +717,8 @@ async function load(){
           steps + act + '</div>';
       }).join("")
     : '<div class="empty">還沒有兌換紀錄</div>';
+
+  renderReject(d.rejectNotice);
 
   $("recs").innerHTML = d.records.length
     ? d.records.map(r=>{
@@ -1013,16 +1051,59 @@ function esc(s){
     c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 }
 
-const LINE_OA = "https://lin.ee/90fLchb";
-
+/* 官方帳號 ID。後端設定優先，沒有就用這個，這樣後端還沒重新部署也能動。
+   原本這裡寫死的是 lin.ee/90fLchb，那是另一個官方帳號，民眾會跑錯聊天室。
+   換官方帳號時，這裡、index.html 的 OA_FALLBACK、Code.gs 的 OA_ID 三處都要改。 */
+const OA_FALLBACK = "@142qmqev";
+function oaId(){
+  const id = String((typeof CONF !== "undefined" && CONF && CONF.oaId) || OA_FALLBACK || "").trim();
+  if(!id) return "";
+  return id.charAt(0) === "@" ? id : ("@" + id);
+}
+/* 回官方帳號聊天室。在 LINE 裡直接關掉這個視窗就會回到剛才的聊天室，
+   剛複製好的兌換碼貼上即可；LIFF 的 webview 不一定允許跳 line.me 的網址。
+   在一般瀏覽器才用 oaMessage 喚起 LINE，直接落在輸入框。 */
 function openLine(){
   try{
     if(typeof liff !== "undefined" && liff.isInClient && liff.isInClient()){
-      liff.openWindow({ url: LINE_OA, external: false });
+      liff.closeWindow();
       return;
     }
   }catch(e){}
-  window.open(LINE_OA, "_blank");
+  const id = oaId();
+  if(id){ location.href = "https://line.me/R/oaMessage/" + encodeURIComponent(id); return; }
+  alert("請回到本官方帳號的聊天室，把兌換碼貼給我們。");
+}
+
+/**
+ * 退件提示。資料由後端算好（核定後 24 小時內、且之後沒有補傳），
+ * 這裡只負責畫。沒有就整塊收起來，不留空白卡片。
+ */
+function renderReject(n){
+  const el = $("rj");
+  if(!el) return;
+  if(!n){ el.style.display = "none"; el.innerHTML = ""; return; }
+  const sub = [n.task, n.sub].filter(Boolean).map(esc).join("　");
+  el.innerHTML =
+    '<div class="rj-h">' +
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c0503f" ' +
+      'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ' +
+      'style="flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="9"></circle>' +
+      '<path d="M12 7.5v5"></path><path d="M12 16.5h.01"></path></svg>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div class="rj-t">有 1 筆未通過，可以補傳</div>' +
+        '<div class="rj-s">' + sub + '　<b>' + esc(n.rtime) + ' 核定</b>' +
+        (n.uploadTime ? '　上傳於 ' + esc(n.uploadTime) : '') + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="rj-r">退件原因：<b>' + esc(n.reason) + '</b></div>' +
+    '<div class="rj-n">該次<b>不計入額度</b>，重新上傳一次即可。' +
+      '補傳後本提示會自動消失；<b>核定滿一天</b>也會自動收起，紀錄仍可在下方查看。</div>' +
+    '<button type="button" class="rj-b" onclick="go(\'index.html\')">重新上傳</button>' +
+    (n.other > 0
+      ? '<div class="rj-m">另有 ' + n.other + ' 筆未通過，詳見下方「最近上傳」</div>'
+      : '');
+  el.style.display = "block";
 }
 
 function toggleRecs(){
@@ -1071,6 +1152,80 @@ async function ex(i){
 }
 
 boot();
+
+/* ── 浮動「回到最上面」圓點 ──────────────────────────────────
+   點一下回最上面；按住可以拖，放開吸附到左右邊，左撇子可以停左手邊。
+   位置記在 localStorage。LINE 內建瀏覽器有時會清掉 storage，
+   清掉就回到預設的右下角，不會壞掉。                              */
+function initToTop(){
+  /* 這段 script 排在按鈕前面，直接找會找不到元素，所以等 DOM 齊了再接。
+     arguments.callee 在嚴格模式下不能用，所以用具名函式。 */
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", initToTop, {once:true});
+    return;
+  }
+  var el = document.getElementById("totop");
+  if(!el) return;
+  var KEY = "totop-pos";
+  var drag = false, moved = false, sx = 0, sy = 0, ox = 0, oy = 0;
+
+  function place(side, top){
+    el.style.left  = (side === "L") ? "16px" : "";
+    el.style.right = (side === "L") ? "" : "16px";
+    if(top != null && !isNaN(top)){
+      var max = window.innerHeight - 56 - 8;      // 轉向或換機時夾回畫面內
+      el.style.top = Math.min(Math.max(top, 8), max > 8 ? max : 8) + "px";
+      el.style.bottom = "";
+    }
+  }
+  try{
+    var v = (localStorage.getItem(KEY) || "").split(",");
+    if(v[0] === "L" || v[0] === "R") place(v[0], v[1] ? parseInt(v[1], 10) : null);
+  }catch(e){}
+
+  function onScroll(){
+    var y = window.scrollY || document.documentElement.scrollTop || 0;
+    el.classList.toggle("on", y > 200);
+  }
+  window.addEventListener("scroll", onScroll, {passive:true});
+  onScroll();
+
+  el.addEventListener("pointerdown", function(e){
+    drag = true; moved = false; sx = e.clientX; sy = e.clientY;
+    var r = el.getBoundingClientRect(); ox = r.left; oy = r.top;
+    try{ el.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  el.addEventListener("pointermove", function(e){
+    if(!drag) return;
+    var dx = e.clientX - sx, dy = e.clientY - sy;
+    if(!moved && Math.abs(dx) + Math.abs(dy) < 8) return;   // 8px 以內算點一下，不算拖曳
+    moved = true;
+    el.style.left = (ox + dx) + "px"; el.style.right = "";
+    el.style.top  = (oy + dy) + "px"; el.style.bottom = "";
+  });
+  function end(){
+    if(!drag) return;
+    drag = false;
+    if(!moved){
+      try{ window.scrollTo({top:0, behavior:"smooth"}); }catch(e){ window.scrollTo(0,0); }
+      return;
+    }
+    var r = el.getBoundingClientRect();
+    var side = (r.left + r.width / 2) < window.innerWidth / 2 ? "L" : "R";
+    var top  = Math.round(r.top);
+    place(side, top);
+    try{ localStorage.setItem(KEY, side + "," + top); }catch(e){}
+  }
+  el.addEventListener("pointerup", end);
+  el.addEventListener("pointercancel", end);
+}
+initToTop();
 </script>
+
+<button id="totop" type="button" aria-label="回到最上面">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 19V6"></path><path d="m5.5 12.5 6.5-6.5 6.5 6.5"></path></svg>
+</button>
 </body>
 </html>

@@ -309,6 +309,17 @@ input[type=file]{display:none}
 .step-no{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;
          background:var(--amber);color:var(--ink);border-radius:50%;font-size:14px;
          font-weight:700;margin-right:6px}
+
+/* 浮動「回到最上面」。捲過 200px 才出現，免得一開始就擋住內容。
+   可拖曳，放開吸附到左邊或右邊，左撇子可以停到左手邊。
+   touch-action:none 是必要的，否則拖曳會被瀏覽器當成捲動。
+   z-index 要低於說明面板，不然面板打開時圓點會浮在上面。 */
+#totop{position:fixed;right:16px;bottom:20px;width:56px;height:56px;border-radius:50%;
+  background:var(--blue);border:none;padding:0;display:none;align-items:center;
+  justify-content:center;box-shadow:0 3px 10px rgba(61,50,38,.3);cursor:pointer;
+  touch-action:none;z-index:30}
+#totop.on{display:flex}
+#totop:active{opacity:.85}
 </style>
 </head>
 <body>
@@ -630,7 +641,7 @@ function askUs(){
 const LIFF_ID = "2011533465-IUMILFYy";
 const API     = "https://script.google.com/macros/s/AKfycbytQFDvJ9aBHqrz4TgAqz4pnNfwLv4dxUgjG9pBY1WFipiCKUF5jqiHtF91HX626ZhYHQ/exec";
 /* 改這支檔案時，要與 Code.gs 的 CFG.CLIENT_VERSION 改成同一個值 */
-const VERSION = "2026-11-20e";
+const VERSION = "2026-11-20f";
 /* ═══════════ */
 
 /* 各任務的畫面文字。改任務名稱時這裡也要一起改。 */
@@ -1392,6 +1403,80 @@ function closeWin(){ if(liff.isInClient()) liff.closeWindow(); }
 })();
 
 boot();
+
+/* ── 浮動「回到最上面」圓點 ──────────────────────────────────
+   點一下回最上面；按住可以拖，放開吸附到左右邊，左撇子可以停左手邊。
+   位置記在 localStorage。LINE 內建瀏覽器有時會清掉 storage，
+   清掉就回到預設的右下角，不會壞掉。                              */
+function initToTop(){
+  /* 這段 script 排在按鈕前面，直接找會找不到元素，所以等 DOM 齊了再接。
+     arguments.callee 在嚴格模式下不能用，所以用具名函式。 */
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", initToTop, {once:true});
+    return;
+  }
+  var el = document.getElementById("totop");
+  if(!el) return;
+  var KEY = "totop-pos";
+  var drag = false, moved = false, sx = 0, sy = 0, ox = 0, oy = 0;
+
+  function place(side, top){
+    el.style.left  = (side === "L") ? "16px" : "";
+    el.style.right = (side === "L") ? "" : "16px";
+    if(top != null && !isNaN(top)){
+      var max = window.innerHeight - 56 - 8;      // 轉向或換機時夾回畫面內
+      el.style.top = Math.min(Math.max(top, 8), max > 8 ? max : 8) + "px";
+      el.style.bottom = "";
+    }
+  }
+  try{
+    var v = (localStorage.getItem(KEY) || "").split(",");
+    if(v[0] === "L" || v[0] === "R") place(v[0], v[1] ? parseInt(v[1], 10) : null);
+  }catch(e){}
+
+  function onScroll(){
+    var y = window.scrollY || document.documentElement.scrollTop || 0;
+    el.classList.toggle("on", y > 200);
+  }
+  window.addEventListener("scroll", onScroll, {passive:true});
+  onScroll();
+
+  el.addEventListener("pointerdown", function(e){
+    drag = true; moved = false; sx = e.clientX; sy = e.clientY;
+    var r = el.getBoundingClientRect(); ox = r.left; oy = r.top;
+    try{ el.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  el.addEventListener("pointermove", function(e){
+    if(!drag) return;
+    var dx = e.clientX - sx, dy = e.clientY - sy;
+    if(!moved && Math.abs(dx) + Math.abs(dy) < 8) return;   // 8px 以內算點一下，不算拖曳
+    moved = true;
+    el.style.left = (ox + dx) + "px"; el.style.right = "";
+    el.style.top  = (oy + dy) + "px"; el.style.bottom = "";
+  });
+  function end(){
+    if(!drag) return;
+    drag = false;
+    if(!moved){
+      try{ window.scrollTo({top:0, behavior:"smooth"}); }catch(e){ window.scrollTo(0,0); }
+      return;
+    }
+    var r = el.getBoundingClientRect();
+    var side = (r.left + r.width / 2) < window.innerWidth / 2 ? "L" : "R";
+    var top  = Math.round(r.top);
+    place(side, top);
+    try{ localStorage.setItem(KEY, side + "," + top); }catch(e){}
+  }
+  el.addEventListener("pointerup", end);
+  el.addEventListener("pointercancel", end);
+}
+initToTop();
 </script>
+
+<button id="totop" type="button" aria-label="回到最上面">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"
+       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 19V6"></path><path d="m5.5 12.5 6.5-6.5 6.5 6.5"></path></svg>
+</button>
 </body>
 </html>
