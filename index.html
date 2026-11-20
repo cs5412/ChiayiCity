@@ -296,6 +296,9 @@ input[type=file]{display:none}
 .h-ab{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
   background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px;
   font-size:16px;font-weight:700;font-family:inherit;min-height:44px;cursor:pointer}
+/* 按了打不開時的退路訊息。一定要長在按鈕底下——
+   寫到頁面頂端的話，面板一關人還在下面，看起來就像沒反應。 */
+.h-note{margin:11px 0 0;font-size:14px;line-height:1.7;color:var(--red-d);font-weight:700}
 /* 主視覺一律貼齊上緣滿版，不留邊也不圓角，才不會有被切一刀的感覺。
    圖與 index.html 放同一層，換主視覺只要換檔案，不必改程式。
    全頁只放這一張：載入畫面本來也有一張，但它在頁首這張的下面，
@@ -580,34 +583,54 @@ function openHelp(){
       '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" ' +
       'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
       '<path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9.6 9.6 0 0 1-2.9-.4L4 21l1.4-4.1A8.2 8.2 0 0 1 3 11.5 8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z"></path>' +
-      '</svg>回聊天室問我們</button></div>';
+      '</svg>回聊天室問我們</button>' +
+      '<p class="h-note" id="help-note" style="display:none"></p></div>';
   $("help").classList.add("show");
 }
 function closeHelp(){ $("help").classList.remove("show"); }
 
+/* 官方帳號 ID。後端設定優先，沒有就用這個——這樣後端還沒重新部署時，
+   按鈕也能動。換官方帳號時這裡和 Code.gs 的 OA_ID 兩處都要改。 */
+const OA_FALLBACK = "@142qmqev";
+function oaId(){
+  const id = String((CONF && CONF.oaId) || OA_FALLBACK || "").trim();
+  if(!id) return "";
+  return id.charAt(0) === "@" ? id : ("@" + id);
+}
 /**
- * 回官方帳號聊天室。用 oaMessage，直接落在聊天室的輸入框，
- * 不是落在「加入好友」的簡介頁——民眾已經是好友了，簡介頁還要再點一次才進得去。
- * ＠要編成 %40，這是 LINE 官方文件指定的寫法。
- * 後台沒設帳號 ID 的話，退而求其次關掉這個視窗——在 LINE 裡關掉就會回到原本的聊天室。
+ * 回官方帳號聊天室。兩條路分開走，不要混：
+ *  ・在 LINE 裡（LIFF）：直接關掉這個視窗就會回到剛才的聊天室，最穩。
+ *    LIFF 的 webview 不一定允許跳 line.me 的網址，跳了可能毫無反應。
+ *  ・在一般瀏覽器裡：用 oaMessage 這支網址喚起 LINE，直接落在聊天室的輸入框，
+ *    不是落在「加入好友」的簡介頁。＠要編成 %40，這是 LINE 官方文件的寫法。
+ * 兩條都走不通時，訊息要顯示在面板裡——寫在頁面頂端的話，
+ * 面板一關人還在下面，看起來就像按了沒反應。
  */
 function askUs(){
-  const id = (CONF && CONF.oaId) ? String(CONF.oaId).trim() : "";
+  try{
+    if(window.liff && liff.isInClient && liff.isInClient()){ liff.closeWindow(); return; }
+  }catch(e){}
+  const id = oaId();
   if(id){
-    const at = id.charAt(0) === "@" ? id : ("@" + id);
-    location.href = "https://line.me/R/oaMessage/" + encodeURIComponent(at);
-    return;
+    try{
+      location.href = "https://line.me/R/oaMessage/" + encodeURIComponent(id);
+      return;
+    }catch(e){}
   }
-  try{ if(window.liff && liff.isInClient && liff.isInClient()){ liff.closeWindow(); return; } }catch(e){}
-  setStatus("請回到本官方帳號的聊天室傳訊息給我們", "ok");
-  closeHelp();
+  const n = $("help-note");
+  if(n){
+    n.textContent = id
+      ? "開不起來，請直接回 LINE 搜尋 " + id + " 傳訊息給我們。"
+      : "請回到本官方帳號的聊天室傳訊息給我們。";
+    n.style.display = "block";
+  }
 }
 
 /* ═══ 設定 ═══ */
 const LIFF_ID = "2011533465-IUMILFYy";
 const API     = "https://script.google.com/macros/s/AKfycbytQFDvJ9aBHqrz4TgAqz4pnNfwLv4dxUgjG9pBY1WFipiCKUF5jqiHtF91HX626ZhYHQ/exec";
 /* 改這支檔案時，要與 Code.gs 的 CFG.CLIENT_VERSION 改成同一個值 */
-const VERSION = "2026-11-20d";
+const VERSION = "2026-11-20e";
 /* ═══════════ */
 
 /* 各任務的畫面文字。改任務名稱時這裡也要一起改。 */
