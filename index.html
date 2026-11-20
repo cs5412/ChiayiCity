@@ -297,9 +297,10 @@ input[type=file]{display:none}
   background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px;
   font-size:16px;font-weight:700;font-family:inherit;min-height:44px;cursor:pointer}
 /* 主視覺一律貼齊上緣滿版，不留邊也不圓角，才不會有被切一刀的感覺。
-   圖與 index.html 放同一層，換主視覺只要換檔案，不必改程式。 */
+   圖與 index.html 放同一層，換主視覺只要換檔案，不必改程式。
+   全頁只放這一張：載入畫面本來也有一張，但它在頁首這張的下面，
+   讀取那幾秒會同時看到兩張，所以載入畫面那張拿掉了。 */
 .kv{display:block;width:calc(100% + 28px);margin:-14px -14px 0}
-.kv.in-boot{margin:-18px -18px 16px;width:calc(100% + 36px)}
 .org{margin:30px auto 0;text-align:center;font-size:12px;color:var(--ink3);
      line-height:2;letter-spacing:.02em}
 .step-no{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;
@@ -339,7 +340,6 @@ input[type=file]{display:none}
   </div>
 
   <div id="boot">
-    <img class="kv in-boot" src="kv.jpg" alt="嘉eat永續新生活" onerror="this.remove()">
     <div class="ring"></div>
     <div class="boot-tx" id="boot-tx">正在連線…</div>
     <div class="boot-sub" id="boot-sub">第一次開啟需要幾秒鐘</div>
@@ -586,14 +586,16 @@ function openHelp(){
 function closeHelp(){ $("help").classList.remove("show"); }
 
 /**
- * 回官方帳號聊天室。優先用後台設定的帳號 ID 直接開聊天室；
- * 沒設定就退而求其次關掉這個視窗——在 LINE 裡關掉就會回到原本的聊天室。
+ * 回官方帳號聊天室。用 oaMessage，直接落在聊天室的輸入框，
+ * 不是落在「加入好友」的簡介頁——民眾已經是好友了，簡介頁還要再點一次才進得去。
+ * ＠要編成 %40，這是 LINE 官方文件指定的寫法。
+ * 後台沒設帳號 ID 的話，退而求其次關掉這個視窗——在 LINE 裡關掉就會回到原本的聊天室。
  */
 function askUs(){
   const id = (CONF && CONF.oaId) ? String(CONF.oaId).trim() : "";
   if(id){
     const at = id.charAt(0) === "@" ? id : ("@" + id);
-    location.href = "https://line.me/R/ti/p/" + encodeURIComponent(at);
+    location.href = "https://line.me/R/oaMessage/" + encodeURIComponent(at);
     return;
   }
   try{ if(window.liff && liff.isInClient && liff.isInClient()){ liff.closeWindow(); return; } }catch(e){}
@@ -605,7 +607,7 @@ function askUs(){
 const LIFF_ID = "2011533465-IUMILFYy";
 const API     = "https://script.google.com/macros/s/AKfycbytQFDvJ9aBHqrz4TgAqz4pnNfwLv4dxUgjG9pBY1WFipiCKUF5jqiHtF91HX626ZhYHQ/exec";
 /* 改這支檔案時，要與 Code.gs 的 CFG.CLIENT_VERSION 改成同一個值 */
-const VERSION = "2026-11-20c";
+const VERSION = "2026-11-20d";
 /* ═══════════ */
 
 /* 各任務的畫面文字。改任務名稱時這裡也要一起改。 */
