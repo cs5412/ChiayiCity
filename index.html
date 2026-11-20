@@ -320,6 +320,14 @@ input[type=file]{display:none}
   touch-action:none;z-index:30}
 #totop.on{display:flex}
 #totop:active{opacity:.85}
+
+/* 送出失敗訊息。紅框白底，和一般提示區隔開。 */
+.sendfail{background:#fdf3f1;border:1px solid #e8c4bb;border-left:4px solid var(--red);
+  border-radius:11px;padding:13px 15px;margin-bottom:12px;font-size:15px;
+  line-height:1.75;color:var(--ink)}
+.sendfail .rl{display:block;width:100%;margin-top:11px;background:var(--red);color:#fff;
+  border:none;border-radius:10px;padding:12px;font-size:15.5px;font-weight:700;
+  font-family:inherit;min-height:44px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -476,6 +484,11 @@ input[type=file]{display:none}
       </div>
     </div>
 
+    <!-- 送出失敗時的訊息。放在送出鈕正上方，不是頁面頂端——
+         失敗時人正看著按鈕，訊息寫在最上面等於沒寫。
+         原本只用 alert()，而 LINE 內建瀏覽器有時不顯示 alert，
+         民眾看到的就是「按了沒反應」。 -->
+    <div class="sendfail" id="sendfail" style="display:none"></div>
     <button class="btn" id="send" onclick="send()" disabled>送出</button>
     <button class="btn sub2" onclick="go('records.html')">查看我的紀錄與兌換</button>
   </div>
@@ -641,7 +654,7 @@ function askUs(){
 const LIFF_ID = "2011533465-IUMILFYy";
 const API     = "https://script.google.com/macros/s/AKfycbytQFDvJ9aBHqrz4TgAqz4pnNfwLv4dxUgjG9pBY1WFipiCKUF5jqiHtF91HX626ZhYHQ/exec";
 /* 改這支檔案時，要與 Code.gs 的 CFG.CLIENT_VERSION 改成同一個值 */
-const VERSION = "2026-11-20f";
+const VERSION = "2026-11-20h";
 /* ═══════════ */
 
 /* 各任務的畫面文字。改任務名稱時這裡也要一起改。 */
@@ -1324,6 +1337,7 @@ async function send(){
   const btn = $("send");
   btn.disabled = true; btn.textContent = "上傳中…";
 
+  const fb = $("sendfail"); if(fb) fb.style.display = "none";
   try{
     const d = await api({
       action:"submit", displayName:uname, task:task,
@@ -1382,13 +1396,30 @@ async function send(){
         $("done-stamp").style.display = "none";
       }
     }else{
-      alert(d.error || "送出失敗，請再試一次");
+      failNow(d.error || "送出失敗，請再試一次");
       btn.disabled = false; btn.textContent = "送出"; sending = false;
     }
   }catch(err){
-    alert("網路連線失敗，請確認訊號後再試一次");
+    failNow("網路連線失敗，請確認訊號後再試一次。\n（你填的內容還在，訊號恢復後直接再按一次送出）");
     btn.disabled = false; btn.textContent = "送出"; sending = false;
   }
+}
+
+/**
+ * 送出失敗的訊息。寫在送出鈕正上方並捲過去，不用 alert——
+ * LINE 內建瀏覽器有時不顯示 alert，民眾看到的就是「按了沒反應」。
+ * 版本不符是唯一需要民眾動手的狀況，所以只有那時附重新載入鈕。
+ */
+function failNow(msg){
+  const box = $("sendfail");
+  if(!box){ alert(msg); return; }
+  box.innerHTML = esc(String(msg)).replace(/\n/g, "<br>") +
+    (/版本/.test(String(msg))
+      ? '<button type="button" class="rl" onclick="location.reload()">重新載入頁面</button>'
+      : "");
+  box.style.display = "block";
+  try{ box.scrollIntoView({block:"center", behavior:"smooth"}); }
+  catch(e){ box.scrollIntoView(); }
 }
 
 function closeWin(){ if(liff.isInClient()) liff.closeWindow(); }

@@ -93,14 +93,16 @@ h2{font-size:14px;margin:0 0 11px}
 .book-in{display:block;cursor:pointer;color:var(--ink)}
 .bi-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .bi-head h2{margin:0}
-.bi-year{font-size:13.5px;color:var(--ink2)}
+/* 畫布⑧核定：年度標籤用紅，和卡片標題拉開層次。白卡上 4.71:1。 */
+.bi-year{font-size:13.5px;color:var(--red);font-weight:700}
 .bi-dots{display:flex;gap:7px;justify-content:space-between;margin-bottom:12px}
 .bi-dots i{width:32px;height:32px;border-radius:50%;flex:0 0 auto;
   display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;
   border:1.5px dashed #cfc6b4;color:transparent}
 .bi-dots i.on{border:2px solid var(--deep);border-style:solid;color:var(--deep)}
 .bi-dots i.on.other{border-color:var(--brown);color:var(--brown)}
-.bi-next{background:var(--tint);border-radius:9px;padding:9px 11px;
+/* 畫布⑧核定：里程碑提示改黃底，和下面一堆淡藍區塊區隔開。#226699 on #FFFAE0 是 5.83:1。 */
+.bi-next{background:#FFFAE0;border-radius:9px;padding:9px 11px;
   font-size:13px;color:var(--deep);font-weight:700}
 
 /* ── 戳印簿整頁 ── */
@@ -500,7 +502,7 @@ h2{font-size:14px;margin:0 0 11px}
 const LIFF_ID = "2011533465-IUMILFYy";
 const API     = "https://script.google.com/macros/s/AKfycbytQFDvJ9aBHqrz4TgAqz4pnNfwLv4dxUgjG9pBY1WFipiCKUF5jqiHtF91HX626ZhYHQ/exec";
 /* 改這支檔案時，要與 Code.gs 的 CFG.CLIENT_VERSION 改成同一個值 */
-const VERSION = "2026-11-20f";
+const VERSION = "2026-11-20h";
 /* ═════════════════════════ */
 
 /* 獎勵品項由後端提供，改設定不必改前端 */
