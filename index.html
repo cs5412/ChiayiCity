@@ -13,12 +13,17 @@
 <style>
 :root{
   color-scheme:light only;
-  --cream:#f7f4ea; --card:#fff; --ink:#3d3226; --ink2:#7d7365; --ink3:#a9a196;
+  /* ink2/ink3 由 #7d7365 / #a9a196 改深：原本在米底上只有 4.2:1 與 2.3:1，
+     40 歲以上在手機戶外幾乎看不見。三層都要過 WCAG AA 的 4.5:1，
+     又要保住由深到淺的主次感，所以 ink2 與 ink3 不同色。
+     實測最低值：ink 12.5:1、ink2 6.4:1、ink3 5.5:1。 */
+  --cream:#f7f4ea; --card:#fff; --ink:#3d3226; --ink2:#5e564a; --ink3:#6a6154;
   /* 畫布核定色：主色淡藍、強調深藍、提示底淡藍、步驟圓點黃 */
-  --blue:#73A5CA; --deep:#2F6B99; --tint:#EAF2F8; --amber:#FFC81E;
+  --blue:#226699; --deep:#226699; --tint:#EAF2F8; --amber:#FFC81E;
+  --chip:#dce9f3;
   --brown:#8b6f47; --red:#c0503f; --line:#e5ded0;
   /* 舊名保留，指向新色，避免漏改的地方跳回綠色 */
-  --green:#2F6B99; --soft:#EAF2F8;
+  --green:#226699; --soft:#EAF2F8;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
@@ -26,11 +31,21 @@ body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
 .wrap{max-width:520px;margin:0 auto}
 
 .head{display:flex;align-items:center;gap:11px;margin-bottom:14px}
-.head img{width:44px;height:44px;border-radius:50%;background:#e8e2d5;object-fit:cover}
-.head .who{font-weight:700;font-size:15px}
-.head .pts{font-size:12px;color:var(--ink2)}
+.head img{width:44px;height:44px;border-radius:50%;background:#e8e2d5;object-fit:cover;flex-shrink:0}
+.head .idbox{min-width:0}
+.head .who{font-weight:700;font-size:16px}
+/* 點數做成可點的膠囊：填色、有箭頭，和右邊線框的說明鈕分得開 */
+.head .pts{display:inline-flex;align-items:center;gap:5px;margin-top:4px;
+  background:var(--chip);border-radius:99px;padding:11px 14px;
+  font-size:14.5px;color:var(--deep);font-weight:700;white-space:nowrap;
+  text-decoration:none;cursor:pointer}
+.head .help{margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;
+  border:1px solid #cfc6b4;border-radius:10px;padding:10px 12px;
+  color:var(--ink2);font-size:13.5px;font-weight:600;min-height:44px;
+  white-space:nowrap;text-decoration:none;background:transparent;cursor:pointer;
+  font-family:inherit}
 
-#status{padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:14px;white-space:pre-wrap}
+#status{padding:10px 12px;border-radius:10px;font-size:14px;margin-bottom:14px;white-space:pre-wrap}
 /* ── 啟動畫面：讓等待有進度感，而不是一行不動的字 ── */
 #boot{padding:34px 18px 30px;text-align:center}
 .ring{width:34px;height:34px;margin:0 auto 14px;border-radius:50%;
@@ -38,7 +53,7 @@ body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
       animation:spin .85s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .boot-tx{font-size:14px;font-weight:700;color:var(--ink)}
-.boot-sub{font-size:12px;color:var(--ink2);margin-top:4px;min-height:18px}
+.boot-sub{font-size:13px;color:var(--ink2);margin-top:4px;min-height:18px}
 .boot-bar{width:170px;height:3px;margin:15px auto 0;background:#e5ded0;
           border-radius:99px;overflow:hidden}
 .boot-bar i{display:block;height:100%;width:8%;background:var(--blue);
@@ -62,11 +77,11 @@ body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
 
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
       padding:16px;margin-bottom:13px}
-.lbl{font-size:13.5px;font-weight:700;margin-bottom:4px;display:block}
-.guide{font-size:12px;color:var(--ink2);background:var(--tint);border-radius:9px;
+.lbl{font-size:15px;font-weight:700;margin-bottom:4px;display:block}
+.guide{font-size:14px;color:var(--ink2);background:var(--tint);border-radius:9px;
        padding:9px 11px;margin:8px 0 11px;line-height:1.65}
 .guide b{color:var(--ink)}
-.hint{font-size:11.5px;color:var(--ink3);line-height:1.55;margin-top:7px}
+.hint{font-size:13px;color:var(--ink3);line-height:1.55;margin-top:7px}
 
 .tasks{display:grid;gap:8px}
 .task{display:flex;align-items:center;gap:11px;padding:12px;border:1.5px solid var(--line);
@@ -74,39 +89,39 @@ body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
 .task.on{border-color:var(--blue);background:var(--tint)}
 .task.done{opacity:.45}
 .task .em{width:22px;height:22px;flex-shrink:0}
-.task .tt{font-weight:700;font-size:14px}
-.task .td{font-size:11.5px;color:var(--ink2)}
-.task .lim{font-size:11px;color:var(--deep);font-weight:600}
+.task .tt{font-weight:700;font-size:15.5px}
+.task .td{font-size:13px;color:var(--ink2)}
+.task .lim{font-size:12.5px;color:var(--deep);font-weight:600}
 
 .subs{display:flex;gap:7px;flex-wrap:wrap}
 .sub{flex:1;min-width:98px;text-align:center;padding:11px 6px;border:1.5px solid var(--line);
-     border-radius:10px;font-size:13px;cursor:pointer;background:#fff}
+     border-radius:10px;font-size:14.5px;cursor:pointer;background:#fff}
 .sub.on{border-color:var(--blue);background:var(--tint);color:var(--deep);font-weight:700}
 
 /* 任務線二只有兩種，畫布畫成含圖示與副標的大卡，比一排小格好按也好懂 */
 .subs.big{gap:8px;flex-wrap:nowrap}
 .subs.big .sub{min-width:0;padding:13px 10px;border-radius:11px}
 .subs.big .sub .ic{display:block;margin:0 auto 5px;width:26px;height:26px}
-.subs.big .sub .nm{font-size:13.5px;font-weight:700;line-height:1.3}
+.subs.big .sub .nm{font-size:15px;font-weight:700;line-height:1.3}
 .subs.big .sub.on .nm{color:var(--deep)}
-.subs.big .sub .de{font-size:11px;color:var(--ink2);margin-top:2px;font-weight:400;line-height:1.4}
+.subs.big .sub .de{font-size:13px;color:var(--ink2);margin-top:2px;font-weight:400;line-height:1.4}
 
 .items{display:grid;gap:9px}
 .item{display:flex;align-items:center;justify-content:space-between;gap:10px;
       padding:11px 13px;border:1px solid var(--line);border-radius:11px}
-.item .nm{font-size:14px;font-weight:600}
+.item .nm{font-size:15px;font-weight:600}
 .stepper{display:flex;align-items:center;gap:11px}
-.stepper button{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);
+.stepper button{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);
                 background:#fff;font-size:19px;color:var(--ink);cursor:pointer;line-height:1}
 .stepper button:active{background:#eee}
 .stepper button:disabled{opacity:.35}
 .stepper .n{min-width:24px;text-align:center;font-size:16px;font-weight:700}
 .total{margin-top:11px;padding:10px;background:var(--tint);border-radius:9px;
-       text-align:center;font-size:13.5px;font-weight:700;color:var(--deep)}
-.total .warn{display:block;font-size:11.5px;color:var(--red);font-weight:600;margin-top:2px}
-.total .calm{display:block;font-size:11.5px;color:var(--ink2);font-weight:500;margin-top:2px}
+       text-align:center;font-size:15px;font-weight:700;color:var(--deep)}
+.total .warn{display:block;font-size:13px;color:var(--red);font-weight:600;margin-top:2px}
+.total .calm{display:block;font-size:13px;color:var(--ink2);font-weight:500;margin-top:2px}
 
-input[type=text]{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;
+input[type=text]{width:100%;padding:13px 12px;border:1px solid var(--line);border-radius:10px;
                  background:#fff;color:var(--ink);font-size:15px;outline:none}
 textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;
          background:#fff;color:var(--ink);font-size:14px;outline:none;resize:vertical;
@@ -115,12 +130,31 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .stamp-pre{display:flex;align-items:center;gap:13px;background:#fff;
   border:1.5px solid var(--green);border-radius:14px;padding:15px 16px;
   margin:14px 0 4px;text-align:left}
+.done-box .tick{color:var(--deep);background:var(--tint);width:68px;height:68px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto}
+.done-sum{width:100%;background:#fff;border:1px solid var(--line);border-radius:14px;
+  padding:15px 16px;text-align:left;margin-top:4px}
+.done-sum .r{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #efeade}
+.done-sum .r:first-child{padding-top:0}
+.done-sum .r:last-child{border-bottom:0;padding-bottom:0}
+.done-sum .k{width:68px;flex-shrink:0;font-size:13px;color:var(--ink2)}
+.done-sum .v{font-size:14px;font-weight:600}
+.done-sum .v.mono{font-family:ui-monospace,monospace;color:var(--ink2);font-weight:400}
+.done-note{width:100%;margin-top:13px;background:#fdf6e0;border:1px solid #eedfb0;
+  border-radius:10px;padding:11px 13px;font-size:13px;color:#8a6d00;
+  line-height:1.75;text-align:left}
 .stamp-pre{border-color:var(--blue)}
 .stamp-pre.brown{border-color:var(--brown)}
 .stamp-pre .ring{width:64px;height:64px;flex-shrink:0;display:flex;
-  align-items:center;justify-content:center}
-.stamp-pre .body b{color:var(--deep)}
+  align-items:center;justify-content:center;
+  border:0;animation:none}   /* 不可移除：否則會沿用 #boot 的轉圈樣式 */
+.stamp-pre .body{font-size:14px;line-height:1.7}
+.stamp-pre .body b{font-size:15.5px;color:var(--deep)}
 .stamp-pre.brown .body b{color:var(--brown)}
+.stamp-pre .why{color:#7d7365;font-size:13px}
+/* 沒填店家：判不出場域類型，就不發戳印 */
+.stamp-pre.none{border-color:var(--line);border-width:1px}
+.stamp-pre.none .body b{color:var(--ink2)}
 @keyframes preview-pulse{0%,100%{opacity:.44}50%{opacity:.64}}
 .preview-stamp{animation:preview-pulse 3.4s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){.preview-stamp{animation:none;opacity:.52}}
@@ -128,21 +162,29 @@ input:focus,textarea:focus{border-color:var(--blue)}
 .nostamp{display:flex;align-items:flex-start;gap:13px;padding:15px 16px}
 .ns-ring{width:54px;height:54px;border-radius:50%;border:2px solid var(--line);
   display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#fdfcf8}
-.ns-body{font-size:12.5px;line-height:1.7}
-.ns-why{color:var(--ink2);font-size:11.5px}
+.ns-body{font-size:14px;line-height:1.7}
+.ns-why{color:var(--ink2);font-size:13px}
 .ns-tip{margin-top:9px;background:var(--tint);border-radius:9px;padding:9px 11px;
-  font-size:11.5px;color:var(--ink);line-height:1.7}
-.stamp-pre .body{font-size:12.5px;line-height:1.7}
-.stamp-pre .body b{font-size:14px;color:var(--green)}
-.stamp-pre .why{color:#7d7365;font-size:11.5px}
-.storename{font-size:12.5px;margin-top:7px;font-weight:600}
+  font-size:13px;color:var(--ink);line-height:1.7}
+.opt{font-weight:500;color:var(--ink2)}
+.flbl{font-size:14px;color:var(--ink2);display:block;margin-bottom:5px}
+/* 店家選填：後果寫在欄位旁，不等送出才擋人 */
+.note-opt{font-size:14px;color:var(--ink2);background:#f3efe2;border-left:3px solid #cfc6b4;
+  border-radius:0 9px 9px 0;padding:9px 11px;margin-bottom:11px;line-height:1.65}
+.note-opt b{color:var(--ink)}
+.store-sug{display:grid;gap:7px;margin-top:9px}
+.store-sug button{display:block;width:100%;text-align:left;padding:12px;min-height:44px;
+  border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);
+  font-size:14.5px;font-family:inherit;cursor:pointer;line-height:1.5}
+.store-sug button b{color:var(--deep)}
+.storename{font-size:14px;margin-top:7px;font-weight:600}
 .storeok{color:var(--deep)} .storeng{color:var(--red)}
 .stype{background:#efeade;color:var(--ink2);padding:1px 8px;border-radius:99px;font-weight:500}
 
 .shot{display:block;width:100%;padding:26px 12px;border:2px dashed var(--line);
       border-radius:12px;background:#fdfcf8;text-align:center;cursor:pointer}
 .shot .ic{font-size:26px}
-.shot .tx{font-size:13px;color:var(--ink2);margin-top:5px}
+.shot .tx{font-size:14.5px;color:var(--ink2);margin-top:5px}
 .shot.has{border-style:solid;border-color:var(--blue);padding:0;overflow:hidden}
 .shot img{width:100%;display:block;max-height:230px;object-fit:cover}
 input[type=file]{display:none}
@@ -150,42 +192,105 @@ input[type=file]{display:none}
 .btn{width:100%;padding:15px;border:none;border-radius:12px;background:var(--blue);
      color:#fff;font-size:16px;font-weight:700;cursor:pointer;margin-top:6px}
 .btn:disabled{background:#c3bfb6}
-.btn.sub2{background:transparent;color:var(--ink2);border:1px solid var(--line);
-          font-size:14px;padding:11px;margin-top:9px}
+.btn.sub2{background:transparent;color:var(--ink2);border:1px solid #cfc6b4;
+          font-size:15px;padding:14px;margin-top:9px}
 
 .done-box{display:none;text-align:center;padding:28px 16px}
 .done-box.show{display:block}
 .done-box .tick{font-size:46px}
 .done-box h2{font-size:19px;margin:10px 0 5px}
-.done-box p{font-size:13.5px;color:var(--ink2);margin:0 0 6px}
-.sn{font-family:ui-monospace,monospace;font-size:11.5px;color:var(--ink3)}
+.done-box p{font-size:14.5px;color:var(--ink2);margin:0 0 6px}
+.sn{font-family:ui-monospace,monospace;font-size:13px;color:var(--ink3)}
 .einv{display:flex;align-items:flex-start;gap:10px;padding:13px;border:1.5px solid var(--line);
       border-radius:11px;cursor:pointer;font-size:14px;line-height:1.55}
 .einv input{width:19px;height:19px;accent-color:var(--green);flex-shrink:0;margin-top:1px}
 .einv b{color:var(--green)}
 .einv.on{border-color:var(--green);background:var(--soft)}
 .einv.off{opacity:.5;pointer-events:none}
-.bonus-tip{font-size:12px;color:var(--green);font-weight:700;margin-top:8px}
+.bonus-tip{font-size:13.5px;color:var(--green);font-weight:700;margin-top:8px}
+/* 想看算式的人自己展開，不要擋在所有人前面 */
+.dt{margin-top:9px}
+.dt summary{font-size:13.5px;color:var(--deep);font-weight:600;cursor:pointer;
+  padding:12px 0;min-height:44px;list-style:none}
+.dt summary::-webkit-details-marker{display:none}
+.dt summary::before{content:"▸ ";font-size:12px}
+.dt[open] summary::before{content:"▾ "}
+.dt[open] summary{margin-bottom:3px}
 
-.org{margin:30px auto 0;text-align:center;font-size:11px;color:var(--ink3);
+/* 進度列：黏在頂端，同時回答「到哪了」與「還差什麼」。
+   民眾真正的疑問不是第幾步，是送出鈕為什麼按不下去。 */
+#prog{position:sticky;top:0;z-index:20;margin:0 -14px 13px;padding:10px 14px 11px;
+  background:rgba(247,244,234,.96);backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--line);display:none}
+#prog.show{display:block}
+#prog .pl{display:flex;align-items:baseline;gap:8px;margin-bottom:7px;flex-wrap:wrap}
+#prog .pn{font-size:14px;font-weight:700;white-space:nowrap}
+#prog .pm{font-size:13.5px;color:var(--ink2);min-width:0}
+#prog .pm b{color:var(--ink)}
+#prog .pb{display:flex;gap:4px}
+#prog .pb i{flex:1;height:6px;border-radius:99px;background:#e0d9c9}
+#prog .pb i.on{background:var(--blue)}
+@media (prefers-reduced-motion:no-preference){#prog .pb i{transition:background .2s}}
+
+/* 操作說明面板 */
+.sheet{display:none;position:fixed;inset:0;background:rgba(61,50,38,.4);z-index:40;
+  align-items:flex-end;justify-content:center}
+.sheet.show{display:flex}
+.sheet-in{width:100%;max-width:520px;max-height:84vh;overflow:auto;background:var(--card);
+  border-radius:16px 16px 0 0;padding:18px 16px 26px}
+.sheet-h{display:flex;align-items:center;font-size:17px;font-weight:700;margin-bottom:12px}
+.sheet-x{margin-left:auto;width:44px;height:44px;border:none;background:transparent;
+  font-size:19px;color:var(--ink2);cursor:pointer;line-height:1}
+.h-lede{font-size:14.5px;color:var(--ink2);margin:0 0 4px;line-height:1.8}
+.h-step{display:flex;align-items:flex-start;gap:10px;margin:0 0 11px}
+.h-step > b{flex-shrink:0;width:26px;height:26px;line-height:26px;text-align:center;
+  background:var(--amber);color:var(--ink);border-radius:50%;font-size:14px;font-weight:700}
+.h-step .hd b{color:var(--ink)}
+.h-step .hs{display:block;font-size:15px;font-weight:700}
+.h-step .hd{display:block;font-size:13.5px;color:var(--ink2);line-height:1.7}
+.h-sub{font-size:14px;color:var(--ink2);background:var(--tint);border-radius:9px;
+  padding:10px 12px;line-height:1.75;margin-top:4px}
+.h-sub b{color:var(--ink)}
+.h-t{font-size:15.5px;font-weight:700;margin:18px 0 9px}
+.h-q{font-size:14.5px;font-weight:700;margin:0 0 3px}
+.h-a{font-size:13.5px;color:var(--ink2);line-height:1.75;margin:0 0 13px}
+.h-a:last-child{margin-bottom:0}
+.h-a b{color:var(--ink)}
+.org{margin:30px auto 0;text-align:center;font-size:12px;color:var(--ink3);
      line-height:2;letter-spacing:.02em}
 .step-no{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;
-         background:var(--amber);color:var(--ink);border-radius:50%;font-size:12px;
+         background:var(--amber);color:var(--ink);border-radius:50%;font-size:14px;
          font-weight:700;margin-right:6px}
 </style>
 </head>
 <body>
 <div class="wrap">
 
+  <div id="prog" aria-live="polite">
+    <div class="pl"><span class="pn" id="prog-n"></span><span class="pm" id="prog-m"></span></div>
+    <div class="pb" id="prog-b"></div>
+  </div>
+
   <div class="head" id="head" style="display:none">
     <img id="ava" alt="">
-    <div>
+    <div class="idbox">
       <div class="who" id="who"></div>
-      <div class="pts" id="pts"></div>
+      <a class="pts" id="pts" href="records.html"></a>
     </div>
+    <button class="help" type="button" onclick="openHelp()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7d7365" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.6 9.6a2.5 2.5 0 1 1 3.3 2.4c-.5.2-.9.7-.9 1.2v.5"></path><path d="M12 16.6h.01"></path></svg>
+      操作說明
+    </button>
   </div>
 
   <div id="status" class="loading" style="display:none"></div>
+
+  <div class="sheet" id="help">
+    <div class="sheet-in">
+      <div class="sheet-h">操作說明<button type="button" class="sheet-x" onclick="closeHelp()" aria-label="關閉">✕</button></div>
+      <div id="help-body"></div>
+    </div>
+  </div>
 
   <div id="boot">
     <div class="ring"></div>
@@ -242,12 +347,17 @@ input[type=file]{display:none}
     </div>
 
     <div class="card" id="card-store" style="display:none">
-      <span class="lbl"><span class="step-no">3</span>店家編號</span>
+      <span class="lbl"><span class="step-no">3</span>店家<span class="opt">（選填）</span></span>
       <div class="guide">
-        請看店家櫃台的<b>認證標章貼紙</b>，上面有三位數編號。掃 QR Code 會自動帶入。
+        掃店家櫃台的 QR Code 會自動帶入。也可以看<b>認證標章貼紙</b>上的編號，或直接打店名搜尋。
       </div>
-      <input id="store" type="text" inputmode="numeric" placeholder="例如 001" oninput="chkStore()">
+      <div class="note-opt">
+        不填也可以送出，<b>點數照給</b>；但這次<b>不會獲得戳印</b>。
+      </div>
+      <label for="store" class="flbl">店家編號或店名</label>
+      <input id="store" type="text" placeholder="例如：001、東公有零售市場" oninput="chkStore()">
       <div class="storename" id="storename"></div>
+      <div class="store-sug" id="store-sug"></div>
     </div>
 
     <div class="card">
@@ -273,7 +383,7 @@ input[type=file]{display:none}
       <div class="guide" id="g-einv"></div>
       <label class="einv" id="einv-label">
         <input type="checkbox" id="einv-check" onchange="check()">
-        <span>我上傳的消費證明是<b>電子發票畫面</b><br><span style="font-size:11.5px;color:#7d7365">加成僅適用「自備探險嘉」的環保杯，其他項目不受影響</span></span>
+        <span>我上傳的消費證明是<b>電子發票畫面</b><br><span style="font-size:13px;color:#7d7365">加成僅適用「自備探險嘉」的環保杯，其他項目不受影響</span></span>
       </label>
       <div class="hint" id="einv-hint"></div>
     </div>
@@ -309,14 +419,26 @@ input[type=file]{display:none}
   </div>
 
   <div class="done-box" id="done">
-    <div class="tick">✅</div>
+    <div class="tick" aria-hidden="true">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>
+    </div>
     <h2 id="done-t"></h2>
     <p id="done-m"></p>
-    <p class="sn" id="done-s"></p>
+
+    <!-- 這次上傳的內容：民眾送出後最想確認的就是「我剛剛傳了什麼」 -->
+    <div class="done-sum" id="done-sum"></div>
+
     <div class="stamp-pre" id="done-stamp" style="display:none">
       <div class="ring" id="done-ring"></div>
       <div class="body" id="done-stamp-txt"></div>
     </div>
+
+    <!-- 推播停用，民眾不會收到任何通知，所以一定要在這裡講清楚去哪看結果 -->
+    <div class="done-note">
+      審核通常於 1 至 3 個工作天內完成。結果<b>不另行通知</b>，請於「我的紀錄」查看；
+      若未通過，該次<b>不計入額度</b>，可重新上傳。
+    </div>
+
     <button class="btn" onclick="location.reload()">再上傳一筆</button>
     <button class="btn sub2" onclick="go('records.html')">查看我的紀錄</button>
     <button class="btn sub2" id="close-btn" onclick="closeWin()">關閉</button>
@@ -331,11 +453,48 @@ input[type=file]{display:none}
 </div>
 
 <script>
+/* 操作說明：只講怎麼操作。活動主旨與理念走 LINE、發文與海報。
+   刻意不放各任務幾點與兌換品項——那些在操作過程中本來就看得到，
+   寫在這裡只會多一處規則改了要跟著改的地方。 */
+const HELP_STEPS = [
+  ["選一條任務", "看你這次做了哪一件。選好之後，下面要填的欄位會跟著換。"],
+  ["填數量或類型", "自備幾件就按幾下 ＋。帶了環保杯又帶購物袋，兩種分開按。"],
+  ["拍照", "<b>每一件都要入鏡</b>，這是最常被退件的原因。一張拍不下就用第二張補拍。"],
+  ["填店家，或不填", "掃 QR 進來的話已經填好了，打店名也可以搜尋。不填也能送出，只是這次不會有戳印。"],
+  ["送出", "頂端會顯示還差哪幾項。全部完成，送出鈕才按得下去。"]
+];
+const HELP_QA = [
+  ["找不到店家編號怎麼辦？",
+   "欄位下方有「改用店名搜尋」，打店名的前兩三個字就會跳出候選。真的找不到就留空，點數照給，只是那一次不會有戳印。"],
+  ["被退件怎麼辦？",
+   "「我的紀錄」上方會出現提示，寫明原因。重拍一次上傳就好，退件那次<b>不會佔用你的次數</b>。"],
+  ["照片拍不清楚會怎樣？",
+   "以看得到的件數計算。填 5 件但只看得出 3 件，就算 3 件，不會退件，也不會補回差額。"],
+  ["送出後發現填錯了？",
+   "送出後不能修改。等審核結果出來，如果被退件就重傳；如果通過了，請到聊天室告訴我們。"]
+];
+function openHelp(){
+  $("help-body").innerHTML =
+    '<p class="h-lede">自備的東西拍照上傳就能累積點數。以下是操作方式。</p>' +
+    '<div class="h-t">上傳一次，五步</div>' +
+    HELP_STEPS.map((x, i) =>
+      '<div class="h-step"><b>' + (i + 1) + '</b><span><span class="hs">' + esc(x[0]) +
+      '</span><span class="hd">' + x[1] + '</span></span></div>').join("") +
+    '<div class="h-t">送出之後</div>' +
+    '<div class="h-sub">約 <b>3 個工作天</b>完成審核。' +
+    '<b>系統不會傳訊息通知你</b>，請自己回「我的紀錄」看結果。<br>' +
+    '通過了點數自動入帳；沒通過會在「我的紀錄」上方提示並寫明原因，重拍一次上傳就好。</div>' +
+    '<div class="h-t">常見問題</div>' +
+    HELP_QA.map(x => '<p class="h-q">' + esc(x[0]) + '</p><p class="h-a">' + x[1] + '</p>').join("");
+  $("help").classList.add("show");
+}
+function closeHelp(){ $("help").classList.remove("show"); }
+
 /* ═══ 設定 ═══ */
 const LIFF_ID = "2011533465-IUMILFYy";
 const API     = "https://script.google.com/macros/s/AKfycbytQFDvJ9aBHqrz4TgAqz4pnNfwLv4dxUgjG9pBY1WFipiCKUF5jqiHtF91HX626ZhYHQ/exec";
 /* 改這支檔案時，要與 Code.gs 的 CFG.CLIENT_VERSION 改成同一個值 */
-const VERSION = "2026-11-18a";
+const VERSION = "2026-11-20a";
 /* ═══════════ */
 
 /* 各任務的畫面文字。改任務名稱時這裡也要一起改。 */
@@ -372,6 +531,7 @@ const TASK_UI = {
 
 let uid="", uname="", idToken="", task="", subtype="", ph1="", ph2="";
 let CONF=null, counts={}, STORES=[], ONCE={}, EASY=false;
+let booted=false;
 
 function $(i){ return document.getElementById(i); }
 function setStatus(m,c){
@@ -476,25 +636,29 @@ async function api(body){
  * 內圈與字是印章本體。審核通過後在「我的紀錄」才會變成實心雙圈。
  */
 function preSeal(name, cat){
-  const col = (cat === 'self') ? '#2F6B99' : '#8b6f47';
+  // lock＝這次拿不到（例如沒填店家），畫成灰章，和真的會拿到的那枚分得開
+  const col = (cat === 'lock') ? '#8f8574' : (cat === 'self') ? '#226699' : '#8b6f47';
   const ring = (cat === 'self') ? '#cfc6b4' : '#d3c3a8';
+  const lock = (cat === 'lock');
   const n = String(name || '');
   const half = Math.ceil(n.length / 2);
   const l1 = n.length <= 2 ? n : n.slice(0, half);
   const l2 = n.length <= 2 ? '' : n.slice(half);
-  const fs = (l1.length >= 3 || l2.length >= 3) ? 40 : 50;
-  const ls = (fs === 50) ? 6 : 3;
+  const fs = lock ? 72 : (l1.length >= 3 || l2.length >= 3) ? 40 : 50;
+  const ls = lock ? 0 : (fs === 50) ? 6 : 3;
   const y1 = l2 ? (fs === 50 ? 72 : 74) : 100;
   const y2 = (fs === 50) ? 128 : 126;
   return '<svg class="preview-stamp" width="64" height="64" viewBox="0 0 200 200" ' +
-    'role="img" aria-label="' + esc(n) + '戳印，尚未取得">' +
+    'role="img" aria-label="' + (cat === 'lock' ? '這次沒有戳印' : esc(n) + '戳印，尚未取得') + '"' +
+    (cat === 'lock' ? ' style="opacity:.5"' : '') + '>' +
     '<defs><filter id="inkP" x="-25%" y="-25%" width="150%" height="150%">' +
     '<feTurbulence type="fractalNoise" baseFrequency="0.055" numOctaves="3" seed="5" result="n"/>' +
     '<feDisplacementMap in="SourceGraphic" in2="n" scale="3.8" ' +
     'xChannelSelector="R" yChannelSelector="G"/></filter></defs>' +
     '<circle cx="100" cy="100" r="92" fill="none" stroke="' + ring + '" stroke-width="5" ' +
     'stroke-linecap="round" stroke-dasharray="9 20"/>' +
-    '<g transform="rotate(-5 100 100)" filter="url(#inkP)" fill="' + col + '">' +
+    '<g' + (lock ? '' : ' transform="rotate(-5 100 100)" filter="url(#inkP)"') +
+    ' fill="' + col + '">' +
     '<circle cx="100" cy="100" r="78" fill="none" stroke="' + col + '" stroke-width="3"/>' +
     '<text x="100" y="' + y1 + '" text-anchor="middle" dominant-baseline="central" ' +
     'font-size="' + fs + '" font-weight="900" letter-spacing="' + ls + '">' + esc(l1) + '</text>' +
@@ -544,6 +708,16 @@ function refreshPreStamp(){
     break;
   }
 
+  // 需要店家的任務線沒填店家：判不出場域類型，明說這次不發戳印
+  if(!hit && cfg.needStore && !storeOK){
+    box.className = "stamp-pre none";
+    $("pre-ring").innerHTML = preSeal("？", "lock");
+    $("pre-txt").innerHTML =
+      '這次<b>不會獲得戳印</b><br><span class="why">' +
+      '戳印要依店家類型判定。填入店家後，這裡會顯示你這次可拿到哪一枚。</span>';
+    box.style.display = "flex";
+    return;
+  }
   if(!hit){ box.style.display = "none"; return; }
   box.className = "stamp-pre" + (hit.cat === "self" ? "" : " brown");
   $("pre-ring").innerHTML = preSeal(hit.name, hit.cat);
@@ -587,7 +761,7 @@ async function boot(){
     STORES = bd.stores || [];
     for(const k in CONF.itemKinds) counts[k] = 0;
     if(bd.me && bd.me.ok){
-      $("pts").textContent = "目前 " + bd.me.points + " 點・" + bd.me.level;
+      $("pts").textContent = "目前 " + bd.me.points + " 點・" + bd.me.level + " \u203a";
       window.WEEK = bd.me.week || {};
       ONCE = bd.me.onceDone || {};
       EASY = !!bd.me.easyLife;
@@ -606,6 +780,8 @@ async function boot(){
     $("boot").style.display = "none";
     $("skeleton").style.display = "none";
     $("form").style.display = "block";
+    booted = true;
+    renderProg();
     setStatus("✓ 已辨識身分，請由第 1 步開始", "ok");
   }catch(err){
     setStatus("無法取得 LINE 身分\n請從 LINE 的選單重新開啟本頁\n\n" +
@@ -635,7 +811,7 @@ function renderTasks(){
             : "不限次數");
     const d = document.createElement("div");
     d.className = "task" + (full ? " done" : "");
-    d.innerHTML = '<svg class="em" viewBox="0 0 24 24" fill="none" stroke="#2F6B99" ' +
+    d.innerHTML = '<svg class="em" viewBox="0 0 24 24" fill="none" stroke="#226699" ' +
       'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
       (ui.ic||"") + '</svg><div><div class="tt">'+
       cfg.name+(passedOnce?"（已完成）":(doneOnce?"（審核中）":
@@ -687,12 +863,17 @@ function selTask(k, el){
       $("g-einv").innerHTML = st + "<br>通過該任務後，上傳電子發票畫面即可享 <b>" +
         rate + " 倍</b>點數加成（僅限" + bname + "）。";
     }
+    // 民眾要知道的是「我拿到幾點」，不是算式。算式收到可展開的細節裡。
+    // 品名只寫一次，後面接件數就好，不要每個例子都重複一次品名
+    const ex = [2,3,4].map(k => k + " 件算 " + calcB(k, rate) + " 點").join("、");
     $("einv-hint").innerHTML =
-      "<b>加成僅適用「" + bname + "」</b>，餐盒與購物袋維持一件 1 點，不受加成影響。<br>" +
-      "<b>加成只會套用在「自備探險嘉」這一次上傳的點數</b>，不影響其他任務，也不會回溯已獲得的點數。<br>" +
-      "加成後不滿 1 點的部分會捨去，因此" + bname + "<b>需 2 件以上才看得到加成</b>（例：" +
-      bname + " 2 件 × " + rate + " ＝ 3 點；3 件 × " + rate + " ＝ 4.5，實得 4 點）。<br>" +
-      "勾選後審核人員會確認第二張照片是否為電子發票。若不是，將以原始件數計點，不會退件。";
+      "<b>" + bname + "有加成</b>：" + esc(ex) + "。<br>" +
+      "餐盒與購物袋維持一件 1 點。<br>" +
+      "勾選後審核人員會確認第二張照片是否為電子發票。若不是，將以原始件數計點，不會退件。" +
+      '<details class="dt"><summary>加成是怎麼算的</summary>' +
+      "件數乘以 " + rate + " 倍，不滿 1 點的部分捨去，所以" + bname +
+      "要 2 件以上才看得到加成。加成只套用在這一次上傳，不影響其他任務，也不會回溯已獲得的點數。" +
+      "</details>";
   }else{
     $("card-einv").style.display = "none";
     $("einv-check").checked = false;
@@ -741,7 +922,7 @@ function renderSubs(taskKey){
     if(big){
       const u = SUB_UI[k];
       b.innerHTML =
-        '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#2F6B99" stroke-width="1.6" ' +
+        '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#226699" stroke-width="1.6" ' +
         'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + u.ic + '</svg>' +
         '<div class="nm">' + esc(CONF.subtypes[k]) + '</div>' +
         '<div class="de">' + esc(u.de) + '</div>';
@@ -784,6 +965,12 @@ function bump(k, d){
 }
 
 /** 與後端 bonusPoints() 同一套規則，前後台顯示必須一致 */
+/** 件數經加成後實得幾點。捨去與四捨五入的規則跟後端一致。 */
+function calcB(k, rate){
+  const r = k * rate;
+  return (CONF && CONF.bonusRound === "round") ? Math.round(r) : Math.floor(r);
+}
+
 function calcBonus(n){
   const rate = (CONF && CONF.bonusRate) || 1.5;
   const mode = (CONF && CONF.bonusRound) || "floor";
@@ -820,11 +1007,9 @@ function updTotal(){
   const pts = other + calcBonus(bn);
 
   if(pts > tot){
-    const raw = (bn * rate).toFixed(1).replace(/\.0$/,"");
     el.innerHTML = "目前 " + tot + " 件・可得 <b>" + pts + " 點</b>" +
-      '<span class="calm">' + name + " " + bn + " 件 × " + rate + " ＝ " + raw +
-      (raw !== String(other ? pts - other : pts) ? "（未滿 1 點捨去）" : "") +
-      (other ? "，其餘 " + other + " 件不加成" : "") + '</span>';
+      '<span class="calm">' + esc(name) + " 有加成，" + bn + " 件算 " + calcB(bn, rate) + " 點" +
+      (other ? "；其餘 " + other + " 件算 " + other + " 點" : "") + '</span>';
   }else if(bn === 0){
     el.innerHTML = "目前 " + tot + " 件・可得 " + tot + " 點" +
       '<span class="calm">加成僅適用' + name + "，本次未填" + name + '</span>';
@@ -840,11 +1025,22 @@ function chkStore(){
   clearTimeout(storeTimer);
   storeOK = false; check();
   const c = $("store").value.trim();
-  if(!c){ $("storename").textContent = ""; return; }
+  if(!c){ $("storename").textContent = ""; $("store-sug").innerHTML = ""; window.STORE_TYPE = ""; return; }
   // 店家名單已於啟動時載入，直接在本機比對，不需再連線
   storeTimer = setTimeout(()=>{
     const norm = s => /^\d+$/.test(s) ? (s.length>=3 ? s.replace(/^0+(?=\d{3})/,"") : ("00"+s).slice(-3)) : String(s).toUpperCase();
-    const hit = STORES.find(s=>norm(String(s.code)) === norm(c));
+    let hit = STORES.find(s=>norm(String(s.code)) === norm(c));
+    // 編號對不上就當店名找：完全相同優先，其次包含
+    if(!hit){
+      const key = c.replace(/\s+/g, "");
+      hit = STORES.find(s=>String(s.name).replace(/\s+/g,"") === key);
+      if(!hit){
+        const near = STORES.filter(s=>String(s.name).replace(/\s+/g,"").indexOf(key) >= 0);
+        if(near.length === 1) hit = near[0];
+        else if(near.length > 1){ suggest(near.slice(0, 6)); return; }
+      }
+    }
+    suggest([]);
     if(hit){
       storeOK = true;
       window.STORE_TYPE = hit.type || "";
@@ -854,11 +1050,26 @@ function chkStore(){
         (hit.type ? '　<span class="stype">' + esc(hit.type) + '</span>' : '');
     }else{
       window.STORE_TYPE = "";
-      $("storename").className = "storename storeng";
-      $("storename").textContent = "查無此編號，請確認貼紙上的數字";
+      $("storename").className = "storename";
+      $("storename").textContent = "查不到這間店。可以留空直接送出，點數照給，只是這次沒有戳印。";
     }
     check();
   }, 200);
+}
+
+/* 同名的店不只一間時，列出來讓人點，不要叫人自己猜編號 */
+function suggest(list){
+  const box = $("store-sug");
+  if(!list.length){ box.innerHTML = ""; return; }
+  $("storename").textContent = "";
+  box.innerHTML = list.map(s =>
+    '<button type="button" onclick="useStore(\'' + String(s.code).replace(/'/g,"") + '\')">' +
+    esc(s.name) + '　<b>' + esc(String(s.code)) + '</b></button>').join("");
+}
+function useStore(code){
+  $("store").value = code;
+  $("store-sug").innerHTML = "";
+  chkStore();
 }
 
 /* ── 照片 ── */
@@ -891,22 +1102,54 @@ function compress(file, cb){
   rd.readAsDataURL(file);
 }
 
+/**
+ * 這一次上傳必須完成的項目。送出鈕與頂端進度列都讀這一份，
+ * 不要各自判斷——兩邊分開寫就會出現「進度說完成了、鈕卻按不下去」。
+ * 店家是選填，所以不列進來。
+ */
+function steps(){
+  if(!task) return [];
+  const cfg = CONF.tasks[task];
+  const out = [{ label:"選一條任務", ok:true }];
+  if(cfg.needSub)     out.push({ label:"選類型",   ok: !!subtype });
+  if(cfg.multi){
+    const tot = Object.keys(counts).reduce((a,x)=>a+counts[x],0);
+    out.push({ label:"填數量", ok: tot >= 1 });
+  }
+  if(cfg.needLodging) out.push({ label:"填旅宿名稱", ok: !!$("lodging").value.trim() });
+  out.push({ label:"拍主照片", ok: !!ph1 });
+  if(cfg.needProof)   out.push({ label:"拍證明照片", ok: !!ph2 });
+  return out;
+}
+
+function renderProg(){
+  const box = $("prog");
+  if(!task && !booted){ box.classList.remove("show"); return; }
+  const st  = steps();
+  if(!st.length){
+    $("prog-n").textContent = "";
+    $("prog-m").innerHTML = "<b>先選一條任務</b>，下面的欄位會跟著換";
+    $("prog-b").innerHTML = "";
+    box.classList.add("show");
+    return;
+  }
+  const ok   = st.filter(x => x.ok).length;
+  const miss = st.filter(x => !x.ok).map(x => x.label);
+  $("prog-n").textContent = ok + " / " + st.length + " 完成";
+  $("prog-m").innerHTML = miss.length
+    ? "還差：<b>" + miss.map(esc).join("、") + "</b>"
+    : "都填好了，可以送出";
+  $("prog-b").innerHTML = st.map(x => '<i class="' + (x.ok ? "on" : "") + '"></i>').join("");
+  box.classList.add("show");
+}
+
 function check(){
   if(task && CONF.tasks[task] && CONF.tasks[task].multi) updTotal();
   // 預告與送出鈕的啟用條件不同：照片還沒拍，也該先讓人看到會拿到哪一枚
   refreshPreStamp();
-  if(!task || !ph1){ $("send").disabled = true; return; }
-  const cfg = CONF.tasks[task];
-  if(cfg.needStore && !storeOK){ $("send").disabled = true; return; }
-  if(cfg.needSub && !subtype){ $("send").disabled = true; return; }
-  if(cfg.needLodging && !$("lodging").value.trim()){ $("send").disabled = true; return; }
-  if(cfg.needProof && !ph2){ $("send").disabled = true; return; }
-  if(cfg.multi){
-    const tot = Object.keys(counts).reduce((a,x)=>a+counts[x],0);
-    if(tot < 1){ $("send").disabled = true; return; }
-  }
-  $("send").disabled = false;
-  refreshPreStamp();
+  renderProg();
+  const st = steps();
+  $("send").disabled = !st.length || st.some(x => !x.ok);
 }
 
 /* ── 送出 ── */
@@ -937,7 +1180,26 @@ async function send(){
       $("done").classList.add("show");
       $("done-t").textContent = d.status === "通過" ? "任務完成！" : "上傳成功";
       $("done-m").textContent = d.msg || "";
-      $("done-s").textContent = d.serial ? "編號 " + d.serial : "";
+      // 摘要只列這次真的有填的欄位，沒填的不佔一行
+      const cfgD = CONF.tasks[task] || {};
+      const rows = [["任務", cfgD.name || ""]];
+      if(cfgD.needStore){
+        const code = $("store").value.trim().toUpperCase();
+        const hit  = (STORES || []).filter(x => String(x.code).toUpperCase() === code)[0];
+        rows.push(["店家", code ? ((hit ? hit.name : "") + "　" + code) : "未填（本次無戳印）"]);
+      }
+      if(cfgD.needLodging) rows.push(["旅宿", $("lodging").value.trim()]);
+      if(cfgD.needSub && subtype) rows.push(["類型", CONF.subtypes[subtype] || ""]);
+      if(cfgD.multi){
+        const parts = Object.keys(CONF.itemKinds)
+          .filter(k => counts[k] > 0)
+          .map(k => CONF.itemKinds[k] + " ×" + counts[k]);
+        if(parts.length) rows.push(["回報件數", parts.join("、")]);
+      }
+      if(d.serial) rows.push(["編號", d.serial, "mono"]);
+      $("done-sum").innerHTML = rows.map(r =>
+        '<div class="r"><div class="k">' + esc(r[0]) + '</div>' +
+        '<div class="v' + (r[2] ? " " + r[2] : "") + '">' + esc(r[1]) + '</div></div>').join("");
 
       // 戳印預告。只在這次真的會發時顯示，避免給錯期待。
       const sp = d.stamp;

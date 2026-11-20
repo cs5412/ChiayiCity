@@ -12,24 +12,28 @@
 <style>
 :root{
   color-scheme:light only;
-  --cream:#f7f4ea; --card:#fff; --ink:#3d3226; --ink2:#7d7365; --ink3:#a9a196;
-  --blue:#73A5CA; --deep:#2F6B99; --tint:#EAF2F8; --amber:#FFC81E;
+  /* ink2/ink3 由 #7d7365 / #a9a196 改深：原本在米底上只有 4.2:1 與 2.3:1，
+     40 歲以上在手機戶外幾乎看不見。三層都要過 WCAG AA 的 4.5:1，
+     又要保住由深到淺的主次感，所以 ink2 與 ink3 不同色。
+     實測最低值：ink 12.5:1、ink2 6.4:1、ink3 5.5:1。 */
+  --cream:#f7f4ea; --card:#fff; --ink:#3d3226; --ink2:#5e564a; --ink3:#6a6154;
+  --blue:#226699; --deep:#226699; --tint:#EAF2F8; --amber:#FFC81E;
   --brown:#8b6f47; --red:#c0503f; --line:#e5ded0;
-  --green:#2F6B99; --soft:#EAF2F8;
+  --green:#226699; --soft:#EAF2F8;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
      font-family:-apple-system,"Noto Sans TC",sans-serif;line-height:1.6}
 .wrap{max-width:520px;margin:0 auto}
 
-#status{padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:14px;white-space:pre-wrap}
+#status{padding:10px 12px;border-radius:10px;font-size:14px;margin-bottom:14px;white-space:pre-wrap}
 #boot{padding:34px 18px 30px;text-align:center}
 .ring{width:34px;height:34px;margin:0 auto 14px;border-radius:50%;
       border:3px solid #e5ded0;border-top-color:var(--blue);
       animation:spin .85s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .boot-tx{font-size:14px;font-weight:700;color:var(--ink)}
-.boot-sub{font-size:12px;color:var(--ink2);margin-top:4px;min-height:18px}
+.boot-sub{font-size:13.5px;color:var(--ink2);margin-top:4px;min-height:18px}
 .boot-bar{width:170px;height:3px;margin:15px auto 0;background:#e5ded0;
           border-radius:99px;overflow:hidden}
 .boot-bar i{display:block;height:100%;width:8%;background:var(--blue);
@@ -48,19 +52,22 @@ body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
 
 .pt-card{
   display:flex;align-items:center;gap:14px;
-  background:#73A5CA;
+  background:#226699;
   border-radius:16px;padding:20px 18px;margin-bottom:14px;
 }
 .pt-left{flex:1;min-width:0}
+.pt-note{font-size:14px;color:var(--ink2);background:#f3efe2;border-left:3px solid #cfc6b4;
+  border-radius:0 9px 9px 0;padding:10px 12px;line-height:1.7;margin:-3px 0 0}
+.pt-note b{color:var(--ink)}
 .pt-card .n{font-size:44px;font-weight:800;line-height:1;color:#fff}
-.pt-card .u{font-size:12.5px;color:rgba(255,255,255,.9);margin-top:3px}
+.pt-card .u{font-size:14px;color:rgba(255,255,255,.9);margin-top:3px}
 .pt-card .lv{
   display:inline-block;margin-top:11px;background:rgba(255,255,255,.22);
-  padding:4px 13px;border-radius:99px;font-size:11.5px;color:#fff;
+  padding:4px 13px;border-radius:99px;font-size:13px;color:#fff;
 }
 .pt-btn{
   background:#fff;border:none;color:var(--red);border-radius:14px;
-  padding:14px 16px;font-size:13.5px;font-weight:800;line-height:1.4;
+  padding:14px 16px;font-size:15px;font-weight:800;line-height:1.4;
   cursor:pointer;white-space:nowrap;text-align:center;
   min-width:92px;box-shadow:0 2px 8px rgba(0,0,0,.14);
 }
@@ -69,7 +76,7 @@ body{margin:0;padding:16px 14px 40px;background:var(--cream);color:var(--ink);
 
 .fold{display:flex;justify-content:space-between;align-items:center;cursor:pointer;
       user-select:none;margin-bottom:0}
-.fold-i{font-size:11.5px;color:var(--ink2);font-weight:500}
+.fold-i{font-size:13px;color:var(--ink2);font-weight:500}
 #recs.collapsed{display:none}
 #recs{margin-top:11px}
 
@@ -79,52 +86,52 @@ h2{font-size:14px;margin:0 0 11px}
 
 .wk{display:flex;gap:7px;flex-wrap:wrap}
 .wk div{flex:1;min-width:96px;text-align:center;padding:10px 6px;
-        border:1px solid var(--line);border-radius:10px;font-size:12px}
+        border:1px solid var(--line);border-radius:10px;font-size:13.5px}
 .wk .can{border-color:var(--deep);color:var(--deep);font-weight:700}
 
 /* ── 戳印簿入口（我的紀錄頁）── */
 .book-in{display:block;cursor:pointer;color:var(--ink)}
 .bi-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .bi-head h2{margin:0}
-.bi-year{font-size:12px;color:var(--ink2)}
+.bi-year{font-size:13.5px;color:var(--ink2)}
 .bi-dots{display:flex;gap:7px;justify-content:space-between;margin-bottom:12px}
 .bi-dots i{width:32px;height:32px;border-radius:50%;flex:0 0 auto;
-  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;
   border:1.5px dashed #cfc6b4;color:transparent}
 .bi-dots i.on{border:2px solid var(--deep);border-style:solid;color:var(--deep)}
 .bi-dots i.on.other{border-color:var(--brown);color:var(--brown)}
 .bi-next{background:var(--tint);border-radius:9px;padding:9px 11px;
-  font-size:11.5px;color:var(--deep);font-weight:700}
+  font-size:13px;color:var(--deep);font-weight:700}
 
 /* ── 戳印簿整頁 ── */
 .bk-bar{display:flex;align-items:center;gap:10px;margin-bottom:13px}
-.bk-back{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);
+.bk-back{width:44px;height:44px;border-radius:11px;border:1px solid var(--line);
   background:var(--card);color:var(--ink);display:flex;align-items:center;
   justify-content:center;cursor:pointer;flex-shrink:0;padding:0}
 .bk-t{font-size:15px;font-weight:700}
-.bk-s{font-size:11.5px;color:var(--ink2);margin-top:1px}
+.bk-s{font-size:13px;color:var(--ink2);margin-top:1px}
 .prog{border-radius:16px;padding:18px;background:#DCF0FF;margin-bottom:13px}
 .prog-top{display:flex;align-items:baseline;gap:7px}
 .prog-top .n{font-size:38px;font-weight:900;color:var(--ink);line-height:1}
 .prog-top .u{font-size:15px;color:var(--ink)}
-.prog-top .gap{margin-left:auto;font-size:11.5px;color:var(--ink)}
+.prog-top .gap{margin-left:auto;font-size:13px;color:var(--ink)}
 .prog-bar{height:7px;background:rgba(61,50,38,.18);border-radius:99px;
   margin:11px 0 0;overflow:hidden}
 .prog-bar .fill{height:100%;background:var(--blue);border-radius:99px;width:0;
   transition:width .6s cubic-bezier(.3,1,.4,1)}
 .prog-foot{display:flex;justify-content:space-between;margin-top:7px;
-  font-size:10.5px;color:var(--ink)}
+  font-size:12.5px;color:var(--ink)}
 .prog-note{margin-top:10px;padding-top:9px;border-top:1px solid rgba(61,50,38,.26);
-  font-size:10.5px;color:var(--ink);line-height:1.6}
+  font-size:12.5px;color:var(--ink);line-height:1.6}
 
 /* 戳印簿 */
 .stamp-top{display:flex;align-items:baseline;gap:7px;margin:8px 0 0}
 .stamp-top .n{font-size:30px;font-weight:900;color:var(--deep);line-height:1}
-.stamp-top .of{font-size:13px;color:var(--ink2)}
+.stamp-top .of{font-size:14px;color:var(--ink2)}
 .bar{height:6px;background:#e8e2d5;border-radius:99px;margin:9px 0 12px;overflow:hidden}
 .bar .fill{height:100%;background:var(--blue);border-radius:99px;width:0;
   transition:width .6s cubic-bezier(.3,1,.4,1)}
-.legend{display:flex;gap:14px;font-size:10.5px;color:var(--ink2);margin-bottom:14px}
+.legend{display:flex;gap:14px;font-size:12.5px;color:var(--ink2);margin-bottom:14px}
 .legend .dot{display:inline-block;width:11px;height:11px;border-radius:50%;
   border:2px solid var(--deep);margin-right:4px;vertical-align:-1px}
 .legend .dot.other{border-color:var(--brown)}
@@ -134,8 +141,8 @@ h2{font-size:14px;margin:0 0 11px}
   transition:transform .2s ease}
 .st:hover{transform:translateY(-2px)}
 .st .seal{width:96px;height:96px}
-.st .nm{font-size:13px;font-weight:700;line-height:1.3;text-align:center}
-.st .dt{font-size:11px;color:var(--ink2);line-height:1.3;text-align:center}
+.st .nm{font-size:14px;font-weight:700;line-height:1.3;text-align:center}
+.st .dt{font-size:12.5px;color:var(--ink2);line-height:1.3;text-align:center}
 .st.locked .nm{color:var(--ink2);font-weight:500}
 @keyframes sealin{0%{transform:scale(1.7) rotate(-12deg);opacity:0}
   55%{transform:scale(.93) rotate(2deg);opacity:1}
@@ -145,22 +152,22 @@ h2{font-size:14px;margin:0 0 11px}
 .seal .ring-dash{animation:dashspin 16s linear infinite}
 @media (prefers-reduced-motion:reduce){
   .seal.got{animation:none}.seal .ring-dash{animation:none}}
-.stamp-note{font-size:11px;color:var(--ink2);line-height:1.7;margin-top:12px}
+.stamp-note{font-size:12.5px;color:var(--ink2);line-height:1.7;margin-top:12px}
 
 /* 里程碑 */
 .ms{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid #efeade}
 .ms:last-child{border-bottom:0}
 .ms .lv{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;
-  align-items:center;justify-content:center;font-size:13px;font-weight:800;
+  align-items:center;justify-content:center;font-size:14px;font-weight:800;
   background:#e8e2d5;color:var(--ink2)}
 .ms.on .lv{background:var(--blue);color:#fff}
 .ms .mid{flex:1;min-width:0}
-.ms .t{font-size:13px;font-weight:700}
-.ms .d{font-size:11px;color:var(--ink2)}
-.ms .act{border:0;border-radius:9px;padding:9px 15px;font-size:12.5px;font-weight:700;
+.ms .t{font-size:14px;font-weight:700}
+.ms .d{font-size:12.5px;color:var(--ink2)}
+.ms .act{border:0;border-radius:9px;padding:9px 15px;font-size:14px;font-weight:700;
   font-family:inherit;white-space:nowrap;background:var(--blue);color:#fff;cursor:pointer}
 .ms .act[disabled]{background:#e8e2d5;color:var(--ink2);cursor:default}
-.ms .wait{font-size:12px;color:var(--ink2);white-space:nowrap}
+.ms .wait{font-size:13.5px;color:var(--ink2);white-space:nowrap}
 
 /* 戳印詳情 */
 .sheet{display:none;position:fixed;inset:0;background:rgba(61,50,38,.45);z-index:60;
@@ -173,45 +180,68 @@ h2{font-size:14px;margin:0 0 11px}
 .sd-ring{width:168px;height:168px;flex-shrink:0}
 .sd-ttl{text-align:center;margin-bottom:16px}
 .sd-name{font-size:19px;font-weight:900}
-.sd-sub{font-size:12.5px;color:var(--ink2);margin-top:2px}
-.sd-state{font-size:11.5px;color:var(--ink2);margin-top:4px}
-.sd-h{font-size:13.5px;margin:0 0 3px;font-weight:700}
-.sd-p{font-size:11px;color:var(--ink2);margin:0 0 12px}
+.sd-sub{font-size:14px;color:var(--ink2);margin-top:2px}
+.sd-state{font-size:13px;color:var(--ink2);margin-top:4px}
+.sd-h{font-size:15px;margin:0 0 3px;font-weight:700}
+.sd-p{font-size:12.5px;color:var(--ink2);margin:0 0 12px}
 .sd-step{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid #efeade}
 .sd-no{width:22px;height:22px;border-radius:50%;background:var(--amber);color:var(--ink);
-  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:800;
   flex-shrink:0;margin-top:2px}
-.sd-tx{font-size:12.5px;line-height:1.7}
+.sd-tx{font-size:14px;line-height:1.7}
+
+/* 里程碑整頁 */
+.ms-hero{border-radius:16px;padding:20px 18px;text-align:center;background:var(--blue);
+  margin-bottom:13px}
+.ms-hero .lbl{font-size:13px;color:#FFD900;letter-spacing:.08em;font-weight:700}
+.ms-hero .ttl{font-size:26px;font-weight:700;color:#fff;margin:3px 0 10px}
+.ms-hero .dots{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.ms-hero .dots i{width:38px;height:38px;border-radius:50%;border:2px solid #fff;
+  display:flex;align-items:center;justify-content:center}
+.ms-item{display:flex;align-items:center;gap:13px}
+.ms-ic{width:56px;height:56px;border-radius:12px;background:var(--tint);display:flex;
+  align-items:center;justify-content:center;flex-shrink:0}
+.ms-tx{flex:1;min-width:0}
+.ms-tx .nm{font-size:15px;font-weight:700}
+.ms-tx .de{font-size:13px;color:var(--ink2)}
+.ms-tx .de b{color:var(--deep)}
+.ms-bar{height:5px;background:#e8e2d5;border-radius:99px;margin:13px 0 0;overflow:hidden}
+.ms-bar .fill{height:100%;background:var(--blue);border-radius:99px;width:0;
+  transition:width .6s cubic-bezier(.3,1,.4,1)}
+.ms-out{font-size:12.5px;color:var(--ink2);margin-top:5px}
+.ms-warn{background:#fdf6e0;border:1px solid #eedfb0;border-radius:10px;padding:11px 13px;
+  font-size:13px;color:#8a6d00;line-height:1.75;margin-bottom:13px}
+#msp .btn[disabled]{background:#e8e2d5;color:var(--ink2);cursor:default}
 .btn{width:100%;padding:14px;border:none;border-radius:12px;background:var(--blue);
   color:#fff;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer}
 .btn.sub2{background:transparent;color:var(--ink2);border:1px solid var(--line);
-  font-size:13.5px;padding:11px;margin-top:10px}
-.sd-row{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #efeade;font-size:12.5px}
+  font-size:15px;padding:11px;margin-top:10px}
+.sd-row{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #efeade;font-size:14px}
 .sd-row:last-child{border-bottom:0}
 .sd-row .k{width:68px;flex-shrink:0;color:var(--ink2)}
 .sd-row .v{font-weight:600;word-break:break-all}
-.sd-tip{background:var(--tint);border-radius:10px;padding:11px 13px;font-size:11.5px;
+.sd-tip{background:var(--tint);border-radius:10px;padding:11px 13px;font-size:13px;
   line-height:1.75;margin:12px 0}
 .wk .did{background:#f2f0ea;color:var(--ink3)}
 
 .rec{display:flex;justify-content:space-between;gap:10px;
-     padding:11px 0;border-bottom:1px solid #f0ece2;font-size:13px}
+     padding:11px 0;border-bottom:1px solid #f0ece2;font-size:14px}
 .rec:last-child{border-bottom:none}
-.rec .t{font-size:11.5px;color:var(--ink3)}
-.st{font-size:11.5px;font-weight:700;white-space:nowrap;padding-top:2px}
+.rec .t{font-size:13px;color:var(--ink3)}
+.st{font-size:13px;font-weight:700;white-space:nowrap;padding-top:2px}
 .s-pass{color:var(--deep)} .s-wait{color:#b58a2b} .s-rej{color:var(--red)}
-.rsn{font-size:11px;color:var(--red);margin-top:2px}
+.rsn{font-size:12.5px;color:var(--red);margin-top:2px}
 
 .gift{display:flex;justify-content:space-between;align-items:center;gap:10px;
       padding:12px 0;border-bottom:1px solid #f0ece2}
 .gift:last-child{border-bottom:none}
-.gift .gn{font-size:13.5px;font-weight:600}
-.gift .gc{font-size:11.5px;color:var(--ink2)}
+.gift .gn{font-size:15px;font-weight:600}
+.gift .gc{font-size:13px;color:var(--ink2)}
 .gift button{background:var(--green);color:#fff;border:none;border-radius:9px;
-             padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+             padding:9px 15px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
 .gift button:disabled{background:#d3cfc6}
 
-.empty{text-align:center;color:var(--ink3);font-size:13px;padding:22px 0}
+.empty{text-align:center;color:var(--ink3);font-size:14px;padding:22px 0}
 .cp{padding:14px 0;border-bottom:1px solid #f0ece2}
 .cp:last-child{border-bottom:none}
 .cp-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
@@ -219,30 +249,30 @@ h2{font-size:14px;margin:0 0 11px}
 .cp .cc{font-family:ui-monospace,monospace;font-size:21px;font-weight:800;
         color:var(--brown);letter-spacing:.1em;margin:6px 0 2px}
 .cp.cp-done .cc{color:var(--ink3);font-weight:600}
-.cp .ct{font-size:11.5px;color:var(--ink3)}
-.cpst{font-size:11.5px;font-weight:700;white-space:nowrap;padding:4px 11px;border-radius:99px}
+.cp .ct{font-size:13px;color:var(--ink3)}
+.cpst{font-size:13px;font-weight:700;white-space:nowrap;padding:4px 11px;border-radius:99px}
 .cpst.cp-new{background:#fdf3e0;color:#8a6516}
 .cpst.cp-ret{background:#e6eff7;color:#2f5f8f}
 .cpst.cp-done{background:var(--tint);color:var(--deep)}
 .cpst.cp-void{background:#f2efe8;color:#8a8378}
 .cp.cp-void{opacity:.7}
 .steps{display:flex;gap:6px;margin:9px 0 8px;flex-wrap:wrap}
-.steps span{font-size:11px;padding:3px 9px;border-radius:99px;background:#f2efe8;color:#b0a99e}
+.steps span{font-size:12.5px;padding:3px 9px;border-radius:99px;background:#f2efe8;color:#b0a99e}
 .steps span.on{background:var(--green);color:#fff;font-weight:700}
-.step-go{border:none;background:#06c755;color:#fff;font-size:11.5px;font-weight:700;
+.step-go{border:none;background:#06c755;color:#fff;font-size:13px;font-weight:700;
          padding:5px 12px;border-radius:99px;cursor:pointer;line-height:1.5}
 .step-go:active{opacity:.85}
 .cp-act{display:flex;gap:8px;margin-top:4px}
-.cp-act button{flex:1;padding:11px;border-radius:10px;font-size:13.5px;font-weight:700;
+.cp-act button{flex:1;padding:11px;border-radius:10px;font-size:15px;font-weight:700;
                border:none;cursor:pointer}
 .bcopy{background:var(--brown);color:#fff}
 .bline{background:#06c755;color:#fff}
 .bret{background:#fff;color:var(--green);border:1.5px solid var(--green);width:100%}
-.cp-tip{font-size:11.5px;color:var(--ink2);line-height:1.6;margin-top:8px;
+.cp-tip{font-size:13px;color:var(--ink2);line-height:1.6;margin-top:8px;
         background:#faf8f3;border-radius:8px;padding:9px 11px}
 .cp-tip.ok{background:var(--tint);color:var(--deep)}
 
-.org{margin:30px auto 0;text-align:center;font-size:11px;color:var(--ink3);
+.org{margin:30px auto 0;text-align:center;font-size:12.5px;color:var(--ink3);
      line-height:2;letter-spacing:.02em}
 .gift.out{opacity:.5}
 .lv1{color:var(--green);font-weight:600}
@@ -277,6 +307,11 @@ h2{font-size:14px;margin:0 0 11px}
       <button class="pt-btn" onclick="go('index.html')"><span class="pl">＋</span>上傳任務</button>
     </div>
 
+    <!-- 兩套東西並行，第一次看的人會問差在哪，所以寫在兩張卡中間 -->
+    <div class="pt-note" id="pt-note" style="display:none">
+      <b>點數</b>可以換東西，<b>戳印</b>是年度紀念，集滿還有額外回饋。
+    </div>
+
     <!-- 戳印簿入口：畫布的「我的紀錄」只放這張摘要卡，點進去才是整本戳印簿 -->
     <a class="card book-in" id="card-stamp" style="display:none" onclick="openBook()">
       <div class="bi-head">
@@ -292,19 +327,19 @@ h2{font-size:14px;margin:0 0 11px}
 
     <div class="card">
       <h2>本週任務</h2>
-      <div style="font-size:11.5px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">顯示本週已完成次數。額度每週一重新計算。</div>
+      <div style="font-size:13px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">顯示本週已完成次數。額度每週一重新計算。</div>
       <div class="wk" id="wk"></div>
     </div>
 
     <div class="card">
       <h2>兌換獎勵</h2>
-      <div style="font-size:11.5px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">點數足夠時按下兌換，系統會產生專屬券碼並顯示於下方「兌換紀錄」，依序操作即可完成。</div>
+      <div style="font-size:13px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">點數足夠時按下兌換，系統會產生專屬券碼並顯示於下方「兌換紀錄」，依序操作即可完成。</div>
       <div id="gifts"></div>
     </div>
 
     <div class="card">
       <h2>兌換紀錄</h2>
-      <div style="font-size:11.5px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">兌換後請將兌換碼傳給我們，我們確認後會在聊天室提供電子券代碼。標示「已核發」代表已經發給你了。</div>
+      <div style="font-size:13px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">兌換後請將兌換碼傳給我們，我們確認後會在聊天室提供電子券代碼。標示「已核發」代表已經發給你了。</div>
       <div id="coupons"></div>
     </div>
 
@@ -342,7 +377,7 @@ h2{font-size:14px;margin:0 0 11px}
 
     <div class="card">
       <h2>年度戳印</h2>
-      <div style="font-size:11.5px;color:var(--ink2);margin:-4px 0 12px;line-height:1.6">完成減量行為、經審核通過後自動蓋上，<b style="color:var(--ink)">不需到場打卡</b>。點選戳印可看取得來源。</div>
+      <div style="font-size:13px;color:var(--ink2);margin:-4px 0 12px;line-height:1.6">完成減量行為、經審核通過後自動蓋上，<b style="color:var(--ink)">不需到場打卡</b>。點選戳印可看取得來源。</div>
       <div class="legend">
         <span><i class="dot self"></i>自備行為類</span>
         <span><i class="dot other"></i>惜物與活動類</span>
@@ -352,15 +387,52 @@ h2{font-size:14px;margin:0 0 11px}
 
     <div class="card" id="card-ms" style="display:none">
       <h2>里程碑回饋</h2>
-      <div style="font-size:11.5px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">以<b style="color:var(--ink)">固定枚數</b>計，年度中新增戳印不影響已設門檻。各階固定總份數，額滿為止，每階限領一次。</div>
+      <div style="font-size:13px;color:var(--ink2);margin:-4px 0 10px;line-height:1.6">以<b style="color:var(--ink)">固定枚數</b>計，年度中新增戳印不影響已設門檻。各階固定總份數，額滿為止，每階限領一次。</div>
       <div id="ms-list"></div>
     </div>
+  </div>
 
-    <div class="org">
-      <div>指導單位：環境部資源循環署　補助</div>
-      <div>主辦單位：嘉義市政府環境保護局　廣告</div>
-      <div>執行單位：志欣環保工程有限公司</div>
+  <!-- 里程碑回饋整頁。畫布是獨立一張圖面，同樣以切換視圖呈現 -->
+  <div id="msp" style="display:none">
+    <div class="bk-bar">
+      <button type="button" class="bk-back" onclick="closeMs()" aria-label="返回戳印簿">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 8 12l7 7"></path></svg>
+      </button>
+      <div class="bk-t">里程碑回饋</div>
     </div>
+
+    <div class="ms-hero">
+      <div class="lbl" id="msp-lbl"></div>
+      <div class="ttl" id="msp-ttl"></div>
+      <div class="dots" id="msp-dots"></div>
+    </div>
+
+    <div class="card">
+      <h2 id="msp-h">可領取的回饋</h2>
+      <div class="ms-item">
+        <div class="ms-ic" id="msp-ic"></div>
+        <div class="ms-tx">
+          <div class="nm" id="msp-item"></div>
+          <div class="de" id="msp-left"></div>
+        </div>
+      </div>
+      <div class="ms-bar"><div class="fill" id="msp-bar"></div></div>
+      <div class="ms-out" id="msp-out"></div>
+      <button type="button" class="btn" id="msp-btn" style="margin-top:15px" onclick="claimFromPage()">領取回饋</button>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-bottom:3px">領取之後</h2>
+      <p style="font-size:12.5px;color:var(--ink2);margin:0 0 12px">與點數兌換相同流程，不需另外學。</p>
+      <div class="sd-step"><div class="sd-no">1</div><div class="sd-tx">按下領取，系統產生<b>專屬券碼</b>，份數同時扣除。</div></div>
+      <div class="sd-step"><div class="sd-no">2</div><div class="sd-tx">將券碼複製後傳到官方帳號聊天室。</div></div>
+      <div class="sd-step" style="border-bottom:0"><div class="sd-no">3</div><div class="sd-tx">承辦人員確認後核發，狀態轉為<b>已核發</b>。</div></div>
+    </div>
+
+    <div class="ms-warn">
+      各階回饋<b>固定總份數、額滿為止</b>，不隨參與人數增加。每人每階限領一次，額滿後即關閉領取，不另行開放。
+    </div>
+
   </div>
 
   <div class="sheet" id="sd" onclick="if(event.target===this)closeStamp()">
@@ -392,7 +464,7 @@ h2{font-size:14px;margin:0 0 11px}
 const LIFF_ID = "2011533465-IUMILFYy";
 const API     = "https://script.google.com/macros/s/AKfycbytQFDvJ9aBHqrz4TgAqz4pnNfwLv4dxUgjG9pBY1WFipiCKUF5jqiHtF91HX626ZhYHQ/exec";
 /* 改這支檔案時，要與 Code.gs 的 CFG.CLIENT_VERSION 改成同一個值 */
-const VERSION = "2026-11-18a";
+const VERSION = "2026-11-20a";
 /* ═════════════════════════ */
 
 /* 獎勵品項由後端提供，改設定不必改前端 */
@@ -638,8 +710,8 @@ let STAMPS = [], MS = [], STAMP_YEAR = 0;
 
 /* 戳印分色。self＝自備行為類，其餘＝惜物與活動類。
    目前沿用本頁既有的綠＋褐。若日後整個前台改成藍色系，
-   把 self 改成 '#2F6B99' 即可，其他地方不必動。 */
-const SEAL_COLOR = { self:'#2F6B99', other:'#8b6f47', lock:'#8f8574' };
+   把 self 改成 '#226699' 即可，其他地方不必動。 */
+const SEAL_COLOR = { self:'#226699', other:'#8b6f47', lock:'#8f8574' };
 
 /**
  * 畫一枚印章。純 SVG，不載圖檔。
@@ -697,7 +769,8 @@ function sealSvg(st, size){
 
 function renderStamps(d){
   if(!d.stampEnabled){ $("card-stamp").style.display = "none";
-                       $("card-ms").style.display = "none"; return; }
+                       $("card-ms").style.display = "none";
+                       $("pt-note").style.display = "none"; return; }
   STAMPS = d.stamps || [];
   MS = d.milestones || [];
   STAMP_YEAR = d.stampYear || 0;
@@ -710,6 +783,7 @@ function renderStamps(d){
   const pct = nextMs ? Math.min(100, got / nextMs.need * 100) : 100;
 
   /* ── 我的紀錄頁的入口摘要卡 ── */
+  $("pt-note").style.display = "block";
   $("card-stamp").style.display = "block";
   $("stamp-year").textContent = (STAMP_YEAR ? (STAMP_YEAR + " 年度") : "") + " ›";
   $("stamp-n").textContent = got;
@@ -744,8 +818,10 @@ function renderStamps(d){
     el.style.animationDelay = (i * 0.12) + 's';
   });
 
+  STAMP_N_NOW = got;
   renderMs(got);
 }
+let STAMP_N_NOW = 0;
 
 /* 戳印簿是獨立一頁，與「我的紀錄」互相切換，回去時捲回原位 */
 let bookScroll = 0;
@@ -771,10 +847,10 @@ const DOT_ICON = {
   flame: '<path d="M12 3c3 3.5 5 6.2 5 9a5 5 0 0 1-10 0c0-2.8 2-5.5 5-9Z"></path>',
   flag:  '<path d="M6 21V4"></path><path d="M6 5h11l-2 3.5L17 12H6"></path>'
 };
-function dotIcon(st){
+function dotIcon(st, force){
   const d = DOT_ICON[st.icon];
   if(!d) return esc(String(st.name || '').charAt(0));   // 沒設圖示就退回首字
-  const col = st.cat === 'self' ? SEAL_COLOR.self : SEAL_COLOR.other;
+  const col = force || (st.cat === 'self' ? SEAL_COLOR.self : SEAL_COLOR.other);
   return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="' + col +
          '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
          d + '</svg>';
@@ -788,6 +864,10 @@ function rocDate(v, sep){
   return (Number(m[1]) - 1911) + (sep || '.') + p(m[2]) + (sep || '.') + p(m[3]);
 }
 
+/* 設定檔的品名帶「里程碑・」前綴是為了份數統計不與一般獎勵撞名，
+   顯示給民眾時把前綴拿掉，畫面才乾淨。 */
+function itemLabel(v){ return String(v || "").replace(/^里程碑[・·]\s*/, ""); }
+
 function renderMs(got){
   if(!MS.length){ $("card-ms").style.display = "none"; return; }
   $("card-ms").style.display = "block";
@@ -796,14 +876,73 @@ function renderMs(got){
     let act;
     if(m.claimed)       act = '<span class="wait">已領取</span>';
     else if(m.soldOut)  act = '<button class="act" disabled>已發完</button>';
-    else if(m.canClaim) act = '<button class="act" onclick="claimMs(' + i + ')">領取</button>';
+    else if(m.canClaim) act = '<button class="act" ' +
+      'onclick="event.stopPropagation();claimMs(' + i + ')">領取</button>';
     else                act = '<span class="wait">再 ' + m.shortBy + ' 枚</span>';
-    return '<div class="ms' + (m.reached ? ' on' : '') + '">' +
+    return '<div class="ms' + (m.reached ? ' on' : '') + '" onclick="openMs(' + i + ')" ' +
+      'style="cursor:pointer">' +
       '<div class="lv">' + m.need + '</div>' +
-      '<div class="mid"><div class="t">集滿 ' + m.need + ' 枚・' + esc(m.item) + '</div>' +
+      '<div class="mid"><div class="t">集滿 ' + m.need + ' 枚・' + esc(itemLabel(m.item)) + '</div>' +
       '<div class="d">' + left + '</div></div>' + act + '</div>';
   }).join("");
 }
+
+/* 里程碑整頁。從戳印簿點任一階進來，顯示那一階的細節。 */
+let msIdx = 0;
+
+function openMs(i){
+  const m = MS[i];
+  if(!m) return;
+  msIdx = i;
+  bookScroll2 = window.scrollY;
+  $("book").style.display = "none";
+  $("msp").style.display = "block";
+  window.scrollTo(0, 0);
+
+  const got = STAMP_N_NOW;
+  $("msp-lbl").textContent = m.reached ? "已達成" : "尚未達成";
+  $("msp-ttl").textContent = "集滿 " + m.need + " 枚戳印";
+
+  // 大卡上畫出這一階需要的枚數：已拿到的填實心，還沒拿到的留空圈
+  let dots = "";
+  for(let n = 0; n < m.need; n++){
+    const st = STAMPS.filter(x => x.got)[n];
+    dots += '<i>' + (st ? dotIcon(st, "#ffffff") : "") + '</i>';
+  }
+  $("msp-dots").innerHTML = dots;
+
+  $("msp-item").textContent = itemLabel(m.item);
+  $("msp-ic").innerHTML =
+    '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#226699" ' +
+    'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M5 8h14l-1 12H6Z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg>';
+
+  if(m.left < 0){
+    $("msp-left").innerHTML = "不限量";
+    $("msp-bar").style.width = "0%";
+    $("msp-out").textContent = "";
+  }else{
+    const all = m.left + (m.used || 0);
+    const used = all - m.left;
+    $("msp-left").innerHTML = "限量 " + all + " 份・<b>剩餘 " + m.left + " 份</b>";
+    $("msp-bar").style.width = (all ? Math.round(used / all * 100) : 0) + "%";
+    $("msp-out").textContent = "已發出 " + used + " / " + all + " 份";
+  }
+
+  const btn = $("msp-btn");
+  if(m.claimed){      btn.textContent = "已領取";   btn.disabled = true; }
+  else if(m.soldOut){ btn.textContent = "已發完";   btn.disabled = true; }
+  else if(m.canClaim){btn.textContent = "領取回饋"; btn.disabled = false; }
+  else {              btn.textContent = "還差 " + m.shortBy + " 枚"; btn.disabled = true; }
+}
+
+let bookScroll2 = 0;
+function closeMs(){
+  $("msp").style.display = "none";
+  $("book").style.display = "block";
+  window.scrollTo(0, bookScroll2);
+}
+function claimFromPage(){ claimMs(msIdx); }
 
 async function claimMs(i){
   const m = MS[i];
